@@ -1,0 +1,107 @@
+<tool id="ARGO_deme_subsampling" name="Subsample deme sequences for an Argo Navis run" version="1.0.0">
+  <description>Subsample demes randomly or via K-means to address sampling depth or bias in deme representatives</description>
+  <macros>
+    <import>macros.xml</import>
+  </macros>
+  <version_command>alnclst -h</version_command>
+  <command interpreter="bash">
+    subsampling.sh ${config}
+  </command>
+  <stdio>
+    <expand macro="basic_errors"/>
+  </stdio>
+  <inputs>
+
+    <param name="alignment" type="data" format="fasta" label="Sequence alignment on which to operate"/>
+
+    <conditional name="deme_specification">
+      <param name="deme_specification_selector" type="select" label="Deme specification method">
+        <option value="spec_file" selected="true">Deme spec file</option>
+        <option value="regexp">From sequence names</option>
+      </param>
+      <when value="spec_file">
+        <param name="deme_spec_file" type="data" format="csv" label="Deme information"/>
+      </when>
+      <when value="regexp">
+        <param name="deme_regexp" type="text" label="Regular expression for extracting deme name"/>
+      </when>
+    </conditional>
+
+    <param name="subsampling_method" type="select" display="checkboxes" multiple="true" label="Subsampling method"
+      help="Specify the subsampling method.
+      Random attempts to account for sampling depth discrepancies between methods, while K-means attempts to correct for sampling bias.">
+      <option value="random" selected="true">Random</option>
+      <option value="kmeans">K-means</option>
+    </param>
+
+    <param name="n_per_deme" type="integer" label="N sequences" min="2"
+      help="Number of sequences to be taken per deme."/>
+
+    <param name="random_seed" type="integer" label="Random seed" min="2"
+      help="Random seed to be used for sequence selections."/>
+
+  </inputs>
+
+  <outputs>
+    <data name="subsampled_alignment" format="fasta" label="Argo subsampled alignment"/>
+    <data name="subsampled_deme_spec_file" format="csv" label="Argo subsampled deme spec"/>
+  </outputs>
+
+  <configfiles>
+    <!-- XXX Not sure if these deme specifications will actually work or not ??? -->
+    <configfile name="config">
+ALIGNMENT="${alignment}"
+DEME_SPECIFICATION_FILE="${deme_specification.spec_file}"
+DEME_SPECIFICATION_REGEX="${deme_specification.regex}"
+DEME_SPECIFICATION_SELECTOR="${deme_specification.deme_specification_selector}"
+
+SUBSAMPLED_ALIGNMENT="${subsampled_alignment}"
+SUBSAMPLED_DEME_SPEC_FILE="${subsampled_deme_spec_file}"
+    </configfile>
+  </configfiles>
+
+  <!-- The contents of the help tag is parsed as reStructuredText. Please see
+       help-template.rst for examples of commonly-used sections in other Galaxy
+       tools. -->
+  <help>
+
+.. class:: infomark
+
+
+What it does
+------------
+
+This is a preprocessing tool for Argo Navis.
+It is designed to help investigate issues related to sampling depth and sampling bias.
+This is facilitated via two downsampling strategies:
+
+* Random downsampling: for sampling depth
+* K-means sampling: for sampling bias
+
+How they work
+-------------
+
+These methods work by making sure that every deme has no more than a certain number of sequences representing it's community.
+
+In the case of discrepancies in sampling _depth_ between some number of demes, _randomly_ downsampling demes to have the same number of sequences ensures that more deeply sampled demes aren't biasing the results.
+However, in cases where representatives from a certain deme are believed to have been sampled wtih a bias towards increased diversity (as in common in submission of sequences to online databases), this isn't quite enough.
+An ideal solution would be to "undo" this bias, but this is typically not possible.
+In such cases we can instead downsample all demes to some low sequence count, and introduce the same artificial bias to each, attempting to put the demes on closer to equal footing.
+This is accomplished via a clustering mechanism (specifically K-means), wherein similar sequences are put into groups together, and only one representative chosen per group.
+When doing this selects for diversity in that if we have 10 sequences in 1 group of similar sequences, and only 1 sequence in another group, using clustering ensures that we'll have one sequence from each group, while random sampling would likley have left us without any in the second.
+While this artificial bias selection does _fix_ the sampling bias in the other deme, it does attempt to put all demes closer to the same footing.
+
+
+Citation
+--------
+
+; Should cite the upcoming AstV paper...
+
+Matsen FA IV, Small CT, Soliven K, Engel GA, Feeroz MM, et al. (2014) `A Novel Bayesian Method for Detection of APOBEC3-Mediated Hypermutation and Its Application to Zoonotic Transmission of Simian Foamy Viruses`_. PLoS Comput Biol 10(2): e1003493. doi:10.1371/journal.pcbi.1003493
+
+.. _wiki documentation: https://github.com/fhcrc/hyperfreq/wiki/Reference-sequence-strategies
+.. _A Novel Bayesian Method for Detection of APOBEC3-Mediated Hypermutation and Its Application to Zoonotic Transmission of Simian Foamy Viruses: http://www.ploscompbiol.org/article/info:doi/10.1371/journal.pcbi.1003493
+
+
+  </help>
+</tool>
