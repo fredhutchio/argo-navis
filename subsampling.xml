@@ -54,6 +54,7 @@ ALIGNMENT="${alignment}"
 DEME_SPECIFICATION_FILE="${deme_specification.spec_file}"
 DEME_SPECIFICATION_REGEX="${deme_specification.regex}"
 DEME_SPECIFICATION_SELECTOR="${deme_specification.deme_specification_selector}"
+SUBSAMPLING_METHOD="${subsampling_method}"
 
 SUBSAMPLED_ALIGNMENT="${subsampled_alignment}"
 SUBSAMPLED_DEME_SPEC_FILE="${subsampled_deme_spec_file}"
