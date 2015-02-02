@@ -7,17 +7,18 @@ cluster center.
 import argparse
 import random
 import alnclst
+import csv
 from Bio import SeqIO
 
 
-settings = dict(consensus_threshold=None, batches=10, max_iters=100)
+settings = dict(consensus_threshold=None, batches=2, max_iters=100)
 
 
 def kmeans_runner(seqrecords, k):
     "Runs kmeans on seqrecords and picks representatives from each cluster, returning their names in a list."
     # Define clustering function we'll run batches number of times
     def clustering():
-        return KMeansClsutering(seqrecords, k, settings['consensus_threshold'], settings['max_iters'])
+        return alnclst.KMeansClsutering(seqrecords, k, settings['consensus_threshold'], max_iters=settings['max_iters'])
     # Run the batches, and pick the one with the best convergence
     _, clusts = min((c.average_distance(), c) for c in (clustering() for i in
              xrange(settings['batches'])))
@@ -28,7 +29,7 @@ def kmeans_runner(seqrecords, k):
         clst_min = clust_reps.get(cluster_id, current)
         if current <= clst_min:
             clust_reps[cluster_id] = current
-    return [seqname for (_, seqname) in clust_reps]
+    return [seqname for (_, (_, seqname)) in clust_reps.iteritems()]
 
 
 def random_runner(seqnames, k):
@@ -39,11 +40,14 @@ def random_runner(seqnames, k):
         return random.sample(seqnames, k)
 
 
-def make_deme_map(deme_spec):
+def make_deme_map(deme_spec, deme_col):
     "Turns deme metadata into a map of deme -> sequence names"
     deme_map = dict()
     for row in deme_spec:
-        deme = row[args.deme_col]
+        try:
+            deme = row[deme_col]
+        except KeyError:
+            raise KeyError, "Make sure to specify a --deme-col that's actually in the deme file"
         seqname = row['sequence']
         try:
             deme_map[deme].append(seqname)
@@ -56,8 +60,9 @@ def get_args():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('alignment', type=argparse.FileType('r'), help="Alignment FASTA file")
     parser.add_argument('demes', type=argparse.FileType('r'), help="CSV metadata specifying deme info")
-    parser.add_argument('-c', '--deme-col', help="Column specifying 'deme' argument in demes spec")
-    parser.add_argument('-k', help="Maximum number of representatives for each deme")
+    parser.add_argument('-c', '--deme-col', default='deme', help="Column specifying 'deme' argument in demes spec")
+    parser.add_argument('-k', help="Maximum number of representatives for each deme", type=int)
+    parser.add_argument('-s', '--seed', help="Random seed for reproducibility")
     parser.add_argument('-m', '--method', choices=('random', 'kmeans'),
             help="Which downsampling method should be used")
     parser.add_argument('out_alignment', type=argparse.FileType('w'), help="Downsampled alignment output")
@@ -72,15 +77,17 @@ def main():
         random.seed(args.seed)
 
     # Create a lit of seqrecords to make things easier for ourselves
-    seqrecords = SeqIO.do_dict(SeqIO.parse(alignment, 'fasta'))
-    demes = list(csv.DictReader(args.clusters))
+    seqrecords = SeqIO.to_dict(SeqIO.parse(args.alignment, 'fasta'))
+    demes = list(csv.DictReader(args.demes))
 
     # Turn our metadata into a map of deme -> seqnames
-    deme_map = make_deme_map(demes)
+    deme_map = make_deme_map(demes, args.deme_col)
 
     # Run the specified downsampling method for each deme, and gather kept representatives
     rep_seqnames = []
     for deme, seqnames in deme_map.iteritems():
+        # this makes it safe to have a csv file with "extra" stuff
+        seqnames = [n for n in seqnames if n in seqrecords.keys()]
         if args.method == 'random':
             deme_rep_seqnames = random_runner(seqnames, args.k)
         else:
@@ -90,10 +97,10 @@ def main():
 
     # Filter down the actual data based on representative names
     deme_rep_seqs = [seqrecords[n] for n in rep_seqnames]
-    deme_rep_meta = [r for r in demes if r['sequence'] in deme_rep_seqs]
+    deme_rep_meta = [r for r in demes if r['sequence'] in rep_seqnames]
 
-    out_demes = csv.DictWriter(args.out_demes, header=deme_rep_meta[0].keys())
-    out_demes.write_header()
+    out_demes = csv.DictWriter(args.out_demes, deme_rep_meta[1].keys())
+    out_demes.writeheader()
     out_demes.writerows(deme_rep_meta)
 
     SeqIO.write(deme_rep_seqs, args.out_alignment, 'fasta')
