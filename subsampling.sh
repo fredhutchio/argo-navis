@@ -13,14 +13,8 @@ then
   DEME_SPECIFICATION_FILE=tmp_deme_spec.csv
 fi
 
-for deme in $( csvcut -c deme $DEME_SPECIFICATION_FILE | sed 1d | sort | uniq ); do
-  # here we do the work for each deme and then combine
-  mkdir -p $deme
-  if [ ${SUBSAMPLING_METHOD} == "random" ] ; then
-    # do stuff
-  else
-    # do other stuff
-  fi
-done
+deme_downsample.py -m $SUBSAMPLING_METHOD -k $N_PER_DEME \
+  $ALIGNMENT $DEME_SPECIFICATION_FILE \
+  $SUBSAMPLED_ALIGNMENT $SUBSAMPLED_DEME_SPEC_FILE
 
 
