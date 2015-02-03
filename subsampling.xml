@@ -3,7 +3,6 @@
   <macros>
     <import>macros.xml</import>
   </macros>
-  <version_command>alnclst -h</version_command>
   <command interpreter="bash">
     subsampling.sh ${config}
   </command>
@@ -34,10 +33,10 @@
       <option value="kmeans">K-means</option>
     </param>
 
-    <param name="n_per_deme" type="integer" label="N sequences" min="2"
+    <param name="n_per_deme" type="integer" value="" label="N sequences" min="2"
       help="Number of sequences to be taken per deme."/>
 
-    <param name="random_seed" type="integer" label="Random seed" min="2"
+    <param name="random_seed" type="integer" value="" label="Random seed" min="2"
       help="Random seed to be used for sequence selections."/>
 
   </inputs>
@@ -78,21 +77,22 @@ This is a preprocessing tool for Argo Navis.
 It is designed to help investigate issues related to sampling depth and sampling bias.
 This is facilitated via two downsampling strategies:
 
-* Random downsampling: for sampling depth
-* K-means sampling: for sampling bias
+- Random downsampling: for sampling depth
+- K-means sampling: for sampling bias
+
 
 How they work
 -------------
 
 These methods work by making sure that every deme has no more than a certain number of sequences representing it's community.
 
-In the case of discrepancies in sampling _depth_ between some number of demes, _randomly_ downsampling demes to have the same number of sequences ensures that more deeply sampled demes aren't biasing the results.
+In the case of discrepancies in sampling *depth* between some number of demes, *randomly* downsampling demes to have the same number of sequences ensures that more deeply sampled demes aren't biasing the results.
 However, in cases where representatives from a certain deme are believed to have been sampled wtih a bias towards increased diversity (as in common in submission of sequences to online databases), this isn't quite enough.
 An ideal solution would be to "undo" this bias, but this is typically not possible.
 In such cases we can instead downsample all demes to some low sequence count, and introduce the same artificial bias to each, attempting to put the demes on closer to equal footing.
 This is accomplished via a clustering mechanism (specifically K-means), wherein similar sequences are put into groups together, and only one representative chosen per group.
 When doing this selects for diversity in that if we have 10 sequences in 1 group of similar sequences, and only 1 sequence in another group, using clustering ensures that we'll have one sequence from each group, while random sampling would likley have left us without any in the second.
-While this artificial bias selection does _fix_ the sampling bias in the other deme, it does attempt to put all demes closer to the same footing.
+While this artificial bias selection does *fix* the sampling bias in the other deme, it does attempt to put all demes closer to the same footing.
 
 
 Citation
@@ -104,7 +104,6 @@ Matsen FA IV, Small CT, Soliven K, Engel GA, Feeroz MM, et al. (2014) `A Novel B
 
 .. _wiki documentation: https://github.com/fhcrc/hyperfreq/wiki/Reference-sequence-strategies
 .. _A Novel Bayesian Method for Detection of APOBEC3-Mediated Hypermutation and Its Application to Zoonotic Transmission of Simian Foamy Viruses: http://www.ploscompbiol.org/article/info:doi/10.1371/journal.pcbi.1003493
-
 
   </help>
 </tool>
