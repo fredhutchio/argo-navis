@@ -1,1 +1,8 @@
-cfar/macros.xml
+<macros>
+  <macro name="basic_errors">
+    <exit_code range="1:" level="fatal"/>
+    <regex match="error" level="fatal"/>
+    <regex match="traceback" level="fatal"/>
+    <regex match="warning" level="warning"/>
+  </macro>
+</macros>
