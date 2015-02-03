@@ -1,5 +1,5 @@
 #!/usr/bin/env lein-exec
-(ns rareify-treefile
+(ns subset-treefile
   (:require [clojure.tools.cli :refer [parse-opts]]
             [clojure.string :as string]
             [clojure.java.io :as io]))
