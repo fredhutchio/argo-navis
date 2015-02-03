@@ -1,0 +1,131 @@
+<tool id="ARGO_beast_run" name="Run Beast" version="1.0.0">
+  <description>Perform a discrete trait ancestral reconstruction analysis (al a Migrate) using BEAST</description>
+  <macros>
+    <import>macros.xml</import>
+  </macros>
+  <command interpreter="bash">
+    beast.sh ${config}
+  </command>
+  <stdio>
+    <expand macro="basic_errors"/>
+  </stdio>
+  <inputs>
+
+    <!--XXX need to make this optional-->
+    <param name="alignment" type="data" format="fasta" label="Sequence alignment"/>
+
+    <!--XXX Here assuming that either you enter deme/date with regexp, or with csv metadata, or directly through BEAST xml; no mixing-->
+    <conditional name="meta_specification">
+      <param name="meta_specification_selector" type="select" label="Metadata specification">
+        <option value="spec_file" selected="true">Deme spec file</option>
+        <option value="regexp">From sequence names</option>
+        <option value="in_beastfile">Use mappings present in specified BEAST XML file</option>
+      </param>
+      <when value="spec_file">
+        <param name="metadata_file" type="data" format="csv" label="Deme and optionally date information"/>
+      </when>
+      <!--XXX - Have to tune these regular expressions-->
+      <when value="regexp">
+        <param name="deme_regexp" type="text" value="[^\s\|]+|(.+)" label="Deme name regular expression"
+          help="Defaults to second value in a 2-ple or triple of '|' separated values."/>
+        <!--XXX make sure this is optional; also make sure that the clock rate specification forks on this-->
+        <param name="date_regexp" type="text" value="[^\s\|]+\|[^\s\|]+\|(.+)" label="Date regular expression"
+          help="This regular expression should extract an integer value, which can be interpetted as a time value.
+          Whether it is years, months, days (etc.) is up to you."/>
+      </when>
+      <when value="in_beastfile">
+        <!--Nothing-->
+      </when>
+    </conditional>
+
+    <!--XXX Be able to refer to these as a collection of related settings?-->
+    <!--XXX - Add some help here giving time estimates and such-->
+    <param name="samples" type="integer" value="10000" label="Random seed" min="100"
+      help="Number of samples to keep out of chain."/>
+    <!--XXX Will have to check to make sure logging frequency is the same between -resume runs-->
+    <param name="sampling_interval" type="integer" value="1000" label="Random seed" min="1"
+      help="Number of states explored in chain between samples. Note that if doing a resume run, this number must be
+      the same as that of the prior run."/>
+
+    <param name="beastfile_template" type="data" format="xml" label="BEAST file XML template"
+      help="If all sequence, deme, and temporal data is present in this file, only the chain length settings above need
+      be specified. Any sequence, deme or temporal data specified above will be taken in preference to whatever is in
+      this file. Any customization of models or priors should be specified through this file. See below for details."/>
+
+    <!--XXX Be able to refer to these as a collection of related settings?-->
+    <!--XXX need to make this optional, but also make sure both are together or errors-->
+    <param name="resume_logfile" type="data" format="txt" label="Logfile from last run; triggers -resume run"/>
+    <param name="resume_treefile" type="data" format="txt" label="Treefile from last run; triggers -resume run"/>
+
+    <!--XXX Really need to make this not require a value so it's random between multiple runs...-->
+    <param name="random_seed" type="integer" value="" label="Random seed" min="2"
+      help="Random seed to be used in BEAST MCMC. Specifying and recording this value can aid in reproducibility."/>
+
+  </inputs>
+
+  <!--XXX Need to make sure we have the right formats here; in particular, there is probably a nexus format, and maybe the-->
+  <!--logfile would work with tabs, but maybe there are more specific types accepted for both these. Or maybe we should add-->
+  <!--them?-->
+  <outputs>
+    <data name="logfile" format="txt" label="Argo BEAST logfile"/>
+    <data name="treefile" format="txt" label="Argo BEAST treefile"/>
+  </outputs>
+
+  <configfiles>
+    <!-- XXX Not sure if these deme specifications will actually work or not ??? -->
+    <configfile name="config">
+ALIGNMENT="${alignment}"
+
+META_SPECIFICATION_SELECTOR="${meta_specification.meta_specification_selector}"
+META_SPECIFICATION_FILE="${meta_specification.spec_file}"
+DEME_SPECIFICATION_REGEX="${meta_specification.deme_regex}"
+DATE_SPECIFICATION_REGEX="${meta_specification.date_regex}"
+
+SAMPLES="${samples}"
+SAMPLING_INTERVAL="${sampling_interval}"
+BEASTFILE_TEMPLATE="${beastfile_template}"
+
+RESUME_LOGFILE="${resume_logfile}"
+RESUME_TREEFILE="${resume_treefile}"
+RANDOM_SEED="${random_seed}"
+
+LOGFILE="${logfile}"
+TREEFILE="${treefile}"
+    </configfile>
+  </configfiles>
+
+  <!-- The contents of the help tag is parsed as reStructuredText. Please see
+       help-template.rst for examples of commonly-used sections in other Galaxy
+       tools. -->
+  <help>
+
+.. class:: infomark
+
+
+What it does
+------------
+
+This runs BEAST for an Argo Navis analysis.
+The inline help should clarify what is required for this tool.
+The output files produced are an "Argo BEAST logfile", suitable for running through Tracer to check for mixing, and an
+"Argo BEAST treefile" for passing along to PACT.
+If you have run BEAST repeatedly on some data using the ``-resume`` functionality (by passing "Last logfile" and "Last treefile")
+these files may become very large, and slow down Tracer and/or PACT significantly.
+To deal with this you can use the Posterior Subset Tool to reduce the size of these files.
+
+If you'd like to customize more fine tuned settings of the BEAST MCMC (models, priors, etc), you can do so by specifying a custom BEAST file template.
+The default template is XXX here and can be used as a starting point.
+
+
+Citation
+--------
+
+Should cite the upcoming AstV paper and BEAST
+
+Matsen FA IV, Small CT, Soliven K, Engel GA, Feeroz MM, et al. (2014) `A Novel Bayesian Method for Detection of APOBEC3-Mediated Hypermutation and Its Application to Zoonotic Transmission of Simian Foamy Viruses`_. PLoS Comput Biol 10(2): e1003493. doi:10.1371/journal.pcbi.1003493
+
+.. _wiki documentation: https://github.com/fhcrc/hyperfreq/wiki/Reference-sequence-strategies
+.. _A Novel Bayesian Method for Detection of APOBEC3-Mediated Hypermutation and Its Application to Zoonotic Transmission of Simian Foamy Viruses: http://www.ploscompbiol.org/article/info:doi/10.1371/journal.pcbi.1003493
+
+  </help>
+</tool>
