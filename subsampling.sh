@@ -9,6 +9,7 @@ export PATH=bin:argo_navis/bin:$PATH
 if [ ${DEME_SPECIFICATION_SELECTOR} == "regexp" ]
 then
   # If we have a regexp, will need to create the specification file to pass along
+  # XXX where should we keep temp stufs?
   metadata_from_seqnames.py -d "${DEME_SPECIFICATION_REGEX}" ${ALIGNMENT} tmp_deme_spec.csv
   DEME_SPECIFICATION_FILE=tmp_deme_spec.csv
 fi
