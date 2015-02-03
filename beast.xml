@@ -74,19 +74,37 @@
   <configfiles>
     <!-- XXX Not sure if these deme specifications will actually work or not ??? -->
     <configfile name="config">
-ALIGNMENT="${alignment}"
+
+#if $alignment == ""
+ALIGNMENT_FLAG="-a ${alignment}"
+#else
+ALIGNMENT_FLAG=""
+#end if
 
 META_SPECIFICATION_SELECTOR="${meta_specification.meta_specification_selector}"
 META_SPECIFICATION_FILE="${meta_specification.spec_file}"
-DEME_SPECIFICATION_REGEX="${meta_specification.deme_regex}"
-DATE_SPECIFICATION_REGEX="${meta_specification.date_regex}"
 
-SAMPLES="${samples}"
-SAMPLING_INTERVAL="${sampling_interval}"
+DEME_REGEX_FLAG="-d ${meta_specification.deme_regex}"
+
+#if $meta_specification.date_regex == ""
+DATE_REGEX_FLAG=""
+#else
+DATE_REGEX_FLAG="-t ${meta_specification.date_regex}"
+#end if
+
+SAMPLES_FLAG="-s ${samples}"
+SAMPLING_INTERVAL_FLAG="-i ${sampling_interval}"
+
 BEASTFILE_TEMPLATE="${beastfile_template}"
 
 RESUME_LOGFILE="${resume_logfile}"
 RESUME_TREEFILE="${resume_treefile}"
+
+#if $meta_specification.date_regex == ""
+DATE_REGEX="-t ${meta_specification.date_regex}"
+#else
+DATE_REGEX=""
+#end if
 RANDOM_SEED="${random_seed}"
 
 LOGFILE="${logfile}"
