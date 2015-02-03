@@ -83,26 +83,31 @@ def get_args():
     parser.add_argument('template', type=argparse.FileType('r'),
             help="""A template BEAST XML (presumably created by Beauti) ready insertion of an alignment and
             discrete trait""")
-    parser.add_argument('alignment')
-    parser.add_argument('metadata', type=argparse.FileType('r'),
+    parser.add_argument('-a', '--alignment')
+    parser.add_argument('-m', '--metadata', type=argparse.FileType('r'),
             help="Should contain 'community' column referencing the deme")
-    parser.add_argument('beastfile', type=argparse.FileType('w'),
-            help="Output BEAST XML file")
     parser.add_argument('-s', '--samples', type=int_or_floatify)
     parser.add_argument('-i', '--sampling-interval', type=int_or_floatify)
+    parser.add_argument('beastfile', type=argparse.FileType('w'),
+            help="Output BEAST XML file")
     return parser.parse_args()
 
 
 def main(args):
     # Read in old data
     xmldoc = ET.parse(args.template)
-    alignment = SeqIO.parse(args.alignment, 'fasta')
-    metadata = list(csv.DictReader(args.metadata))
 
     # Modify the data sets
-    set_alignment(xmldoc, alignment)
-    set_traitset(xmldoc, metadata)
-    set_deme_count(xmldoc, metadata)
+    if args.alignment:
+        alignment = SeqIO.parse(args.alignment, 'fasta')
+        set_alignment(xmldoc, alignment)
+    if args.metadata:
+        metadata = list(csv.DictReader(args.metadata))
+        set_traitset(xmldoc, metadata)
+        # _could_ do something smart here where we look at which sequences in the XML file traitset that match
+        # alignment passed in if _only_ alignment is passed in. Probably not worth it though...
+        set_deme_count(xmldoc, metadata)
+
     set_mcmc(xmldoc, args.samples, args.sampling_interval)
 
     # Write the output
