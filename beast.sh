@@ -39,7 +39,7 @@ fi
 format_beastfile.py $BEASTFILE $ALIGNMENT_FLAG $META_FLAG $SAMPLES_FLAG $SAMPLING_INTERVAL_FLAG beastfile.xml
 
 # XXX Not sure yet how we actually deal with the resume data...
-if [ ${RESUME_LOGFILE} ]
+if [ ${RESUME_LOGFILE} == "" ]
 then
   RESUME_FLAG="-resume"
 else
