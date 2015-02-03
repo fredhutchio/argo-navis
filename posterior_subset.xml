@@ -1,0 +1,59 @@
+<tool id="ARGO_posterior_subset" name="Posterior Subset" version="1.0.0">
+  <description>Subset the posterior of a BEAST run</description>
+  <macros>
+    <import>macros.xml</import>
+  </macros>
+  <command interpreter="bash">
+    beast.sh ${config}
+  </command>
+  <stdio>
+    <expand macro="basic_errors"/>
+  </stdio>
+  <inputs>
+
+    <param name="logfile" type="data" format="txt" label="Logfile"/>
+    <param name="treefile" type="data" format="txt" label="Treefile"/>
+
+    <param name="samples" type="integer" value="10000" label="Samples to keep" min="100"
+      help="Number of samples to keep out of logfile and treefile"/>
+
+  </inputs>
+
+  <outputs>
+    <data name="subset_logfile" format="txt" label="Subset Argo logfile"/>
+    <data name="subset_treefile" format="txt" label="Subset Argo treefile"/>
+  </outputs>
+
+  <configfiles>
+    <!-- XXX Not sure if these deme specifications will actually work or not ??? -->
+    <configfile name="config">
+LOGFILE="${logfile}"
+TREEFILE="${treefile}"
+
+SAMPLES_FLAG="-s ${samples}"
+
+LOGFILE="${logfile}"
+TREEFILE="${treefile}"
+    </configfile>
+  </configfiles>
+
+  <!-- The contents of the help tag is parsed as reStructuredText. Please see
+       help-template.rst for examples of commonly-used sections in other Galaxy
+       tools. -->
+  <help>
+
+.. class:: infomark
+
+What it does
+------------
+
+If BEAST is run on `-resume` a number of times, you may end up with very large log and tree files.
+This can choke up both Tracer and PACT, which you might use for analyzing the logfiles and treefiles respectively.
+The Posterior Subset tool solves this problem by evenly picking samples from each of the posterior files so that there are **Samples** many left.
+The files this returns then can be used in Tracer, PACT, or other tools without issue.
+
+The default number of samples -- 10,000 -- typically offers a pretty good balance between thorough sampling, and small enough date that analysis tools don't choke up.
+
+
+  </help>
+</tool>
