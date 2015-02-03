@@ -1,0 +1,55 @@
+<tool id="ARGO_NAVIS" name="Argo Navis" version="1.0.0">
+  <description>A quick introduction</description>
+  <help>
+
+==========
+Argo Navis
+==========
+
+Discrete Trait Ancestral State Reconstruction with BEAST (al. a Migrate)
+------------------------------------------------------------------------
+
+**Argo Navis** is a *set* of tools designed for carrying out Discrete Trait Ancestral State Reconstructions.
+A discrete trait is really just some trait which takes on some finite number of values;
+In our case, we're specifically interested in traits which apply towards organisms we wish to study phylogenetically.
+This could be applied towards (discrete) phylogeography, or the study of cross species migration or tropism/compartmentalization of viruses.
+
+The core of Argo Navis is a BEAST analysis which produces the posterior of a phylogenetic distribution which includes labeling of the phylogenetic trees in the posterior with the discrete states.
+Internally, BEAST is modelling not just the phylogenetic probabilities, but the probabilities of transitions between the various discrete traits given the data.
+From this data, we're able to look at and compare these various migration rates and begin to ask questions about the history of these discrete traits throughout the evolutionary history under investigation.
+
+* Discrete Trait Ancestral State Reconstruction
+* Model evolutionary histories where we have a discrete trait that evolves along with the sequences
+* These discrete traits can model geographic location, host group, or host tissue type.
+* Looks at both the rates of transition between states, as well as the states at various points in our trees
+
+* Pact let's us ask more pointed questions about these trees
+* We can analyze the distribution of trait assignments and transition rates between traits restricting to temporal regions and subsets of the tree tips
+* See flu and astv
+
+* This tool is composed of several components
+* subsetting: exlained therein; acts as a preprocessor to the BEAST runs, useful for investigating sampling issues (bias/depth)
+* beast: performance the actual phylogenetic analyses, returning posterior files used in later steps
+* (implicit): tracer for analyzing convergence
+* posterior downsampling: If multiple runs of beast are required to obtain good mixing, they can bog down tracer and pact; this tool will prune these to a reasonable length
+* pact: run pact on a specified time range and set of tips and return some statistical analyses as well as figures summarizing the evolutionary/trait history over this period
+
+Your data
+
+* Fasta file of seqs
+* Deme data: either
+  * specificed in a separate metadata CSV file
+  * inlcuded in sequence names, decodable by regular expression
+* Date data (optional): specified just like Deme data; not specifying sets a strict clock and all tips to the same date.
+* Color spec (optional): For pact output figures, provides a consistent color scheme; either CSV of hex values or colorbrewer
+
+
+; Should cite the upcoming AstV paper...
+
+Matsen FA IV, Small CT, Soliven K, Engel GA, Feeroz MM, et al. (2014) `A Novel Bayesian Method for Detection of APOBEC3-Mediated Hypermutation and Its Application to Zoonotic Transmission of Simian Foamy Viruses`_. PLoS Comput Biol 10(2): e1003493. doi:10.1371/journal.pcbi.1003493
+
+.. _wiki documentation: https://github.com/fhcrc/hyperfreq/wiki/Reference-sequence-strategies
+.. _A Novel Bayesian Method for Detection of APOBEC3-Mediated Hypermutation and Its Application to Zoonotic Transmission of Simian Foamy Viruses: http://www.ploscompbiol.org/article/info:doi/10.1371/journal.pcbi.1003493
+
+  </help>
+</tool>
