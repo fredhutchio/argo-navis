@@ -30,10 +30,10 @@
 LOGFILE="${logfile}"
 TREEFILE="${treefile}"
 
-SAMPLES_FLAG="-s ${samples}"
+SAMPLES_FLAG="-c ${samples}"
 
-LOGFILE="${logfile}"
-TREEFILE="${treefile}"
+SUBSET_LOGFILE="${subset_logfile}"
+SUBSET_TREEFILE="${subset_treefile}"
     </configfile>
   </configfiles>
 
