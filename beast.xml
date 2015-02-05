@@ -47,6 +47,8 @@
       help="Number of states explored in chain between samples. Note that if doing a resume run, this number must be
       the same as that of the prior run."/>
 
+    <!--XXX Is it possible to make the default template just a regular data set file? That would make it easy to download ph?-->
+    <!--Could it stil be linked to easily below?-->
     <param name="beastfile_template" type="data" format="xml" label="BEAST file XML template"
       help="If all sequence, deme, and temporal data is present in this file, only the chain length settings above need
       be specified. Any sequence, deme or temporal data specified above will be taken in preference to whatever is in
@@ -119,31 +121,54 @@ TREEFILE="${treefile}"
 
 .. class:: infomark
 
-
 What it does
 ------------
 
 This runs BEAST for an Argo Navis analysis.
 The inline help should clarify what is required for this tool.
-The output files produced are an "Argo BEAST logfile", suitable for running through Tracer to check for mixing, and an
-"Argo BEAST treefile" for passing along to PACT.
-If you have run BEAST repeatedly on some data using the ``-resume`` functionality (by passing "Last logfile" and "Last treefile")
-these files may become very large, and slow down Tracer and/or PACT significantly.
-To deal with this you can use the Posterior Subset Tool to reduce the size of these files.
 
-If you'd like to customize more fine tuned settings of the BEAST MCMC (models, priors, etc), you can do so by specifying a custom BEAST file template.
-The default template is XXX here and can be used as a starting point.
+
+Output files
+------------
+
+This tool outputs two files representing the posterior of distribution of evolutionary histories and ancestral trait states.
+
+**Argo BEAST logfile**: A standard BEAST logfile of sampled states and parameters, suitable for being run through tracer.
+
+**Argo BEAST treefile**: A nexus file of trees from the posterior, with ancestral states labeled. This is suitable for
+being run through PACT.
+
+Note that if you run BEAST a number of time in ``-resume`` mode (see above), these output files may become large enough
+to significantly slow down Tracer and PACT.
+If this becomes a problem, you can use the Posterior Subset Tool to reduce the size of these files.
+
+Do note that it's important that you check your logfile for good mixing and convergence using a tool like `Tracer`_, or
+your analyses will basically mean nothing.
+
+
+Fine tuning
+-----------
+
+If you'd like to customize more fine tuned settings of the BEAST MCMC (models, priors, etc), you can do so by specifying
+a custom BEAST file template.
+The default template closely follows the setup in the `Ancestral State Reconstruction tutorial`_ by Remco Bouckaert,
+which you can use as a guide for setting up your own custom BEAST analysis.
+You can also download the default template XXX here and make modications from that.
+However you should keep in mind that if you use BEAUti to make your customizations, you'll need to follow some of the
+early steps in Remco's tutorial in order to get BEAST Classic set up with BEAUti.
+Frome there, you can download the default template, and load it by firing up BEAUti and going to "File > Load".
+Also, note that for additional assistance working with and tuning BEAST, the `BEAST homepage`_ is a great resource.
+
+.. _Tracer: http://tree.bio.ed.ac.uk/software/tracer/
+.. _Ancestral State Reconstruction tutorial: http://beast-classic.googlecode.com/files/ARv2.0.1.pdf
+.. _BEAST homepage: http://beast-classic.googlecode.com/files/ARv2.0.1.pdf
 
 
 Citation
 --------
 
-Should cite the upcoming AstV paper and BEAST
+Should cite the upcoming AstV paper and BEAST and Trevor's flu paper
 
-Matsen FA IV, Small CT, Soliven K, Engel GA, Feeroz MM, et al. (2014) `A Novel Bayesian Method for Detection of APOBEC3-Mediated Hypermutation and Its Application to Zoonotic Transmission of Simian Foamy Viruses`_. PLoS Comput Biol 10(2): e1003493. doi:10.1371/journal.pcbi.1003493
-
-.. _wiki documentation: https://github.com/fhcrc/hyperfreq/wiki/Reference-sequence-strategies
-.. _A Novel Bayesian Method for Detection of APOBEC3-Mediated Hypermutation and Its Application to Zoonotic Transmission of Simian Foamy Viruses: http://www.ploscompbiol.org/article/info:doi/10.1371/journal.pcbi.1003493
 
   </help>
 </tool>
