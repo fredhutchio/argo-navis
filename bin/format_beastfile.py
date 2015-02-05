@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Formats a given BEAST XML file (possibly all ready to run) and respecifies te information needed to run the
+Formats a given BEAST XML file (possibly all ready to run) and respecifies the information needed to run the
 classic Discrete trait.
 
 Some things that would be nice:
@@ -42,10 +42,26 @@ def deme(metarow):
     return metarow.get('deme') or metarow.get('community')
 
 
-def set_traitset(xmldoc, metadata):
+def set_deme(xmldoc, metadata):
     trait_node = xmldoc.iter('traitSet').next()
     trait_string = ",\n".join([row['sequence'] + "=" + deme(row) for row in metadata])
     trait_node.text = trait_string
+
+
+def build_date_node(date_spec):
+    date_node = ET.Element('trait',
+            id='dateTrait.t:trimmed',
+            spec='beast.evolution.tree.TraitSet',
+            traitname='date')
+    date_node.text = date_spec
+    return date_node
+
+
+def set_date(xmldoc, metadata, date_attr='date'):
+    tree_node = tree.find('.//state/tree')
+    trait_string = ",\n".join([row['sequence'] + "=" + row[date_attr] for row in metadata])
+    date_node = build_date_node(trait_string)
+    tree_node.insert(0, date_node)
 
 
 def set_mcmc(xmldoc, samples, sampling_interval):
@@ -86,8 +102,13 @@ def get_args():
     parser.add_argument('-a', '--alignment')
     parser.add_argument('-m', '--metadata', type=argparse.FileType('r'),
             help="Should contain 'community' column referencing the deme")
-    parser.add_argument('-s', '--samples', type=int_or_floatify)
-    parser.add_argument('-i', '--sampling-interval', type=int_or_floatify)
+    parser.add_argument('-s', '--samples', type=int_or_floatify,
+            help="Number of samples in output log file(s)")
+    parser.add_argument('-d', '--date-col',
+            help="If specified, will add a date specification to the output BEAST XML file")
+    parser.add_argument('-i', '--sampling-interval', type=int_or_floatify,
+            help="""Number of chain states to simulate between successive states samples for logfiles. The
+            total chain length is therefor samples * sampling_interval.""")
     parser.add_argument('beastfile', type=argparse.FileType('w'),
             help="Output BEAST XML file")
     return parser.parse_args()
@@ -103,10 +124,12 @@ def main(args):
         set_alignment(xmldoc, alignment)
     if args.metadata:
         metadata = list(csv.DictReader(args.metadata))
-        set_traitset(xmldoc, metadata)
+        set_deme(xmldoc, metadata)
         # _could_ do something smart here where we look at which sequences in the XML file traitset that match
         # alignment passed in if _only_ alignment is passed in. Probably not worth it though...
         set_deme_count(xmldoc, metadata)
+        if args.date_col:
+            set_date(xmldoc, metadata, args.date_col)
 
     set_mcmc(xmldoc, args.samples, args.sampling_interval)
 
