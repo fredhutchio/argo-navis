@@ -46,16 +46,17 @@ def get_data_id(xmldoc):
     return xmldoc.find(".//data[@name='alignment'][@id]").attrib['id']
 
 
-def deme(metarow):
-    """Returns the deme data from a dict; defaults to :deme, tries getting :community otherwise. Should really
-    refactor this so these are the _two_ defaults, but that the user can still specify via CLI."""
+def default_deme_getter(metarow):
+    """A default function for getting the deme data from a given metadata row. Specifically defaults to 'deme'
+    first, then to 'community' next. Returns none if it doesn't find either."""
     return metarow.get('deme') or metarow.get('community')
 
 
-def set_deme(xmldoc, metadata):
-    """Sets the deme information of the xmldoc based on metadata, and using the `deme` function above."""
+def set_deme(xmldoc, metadata, deme_getter=default_deme_getter):
+    """Sets the deme information of the xmldoc based on metadata, and using the deme_getter (by default the
+    `default_deme_getter` function above."""
     trait_node = xmldoc.iter('traitSet').next()
-    trait_string = ",\n".join([row['sequence'] + "=" + deme(row) for row in metadata])
+    trait_string = ",\n".join([row['sequence'] + "=" + deme_getter(row) for row in metadata])
     trait_node.text = trait_string
 
 
@@ -112,9 +113,9 @@ def set_mcmc(xmldoc, samples, sampling_interval):
         logger.set('logEvery', str(logevery))
 
 
-def set_deme_count(xmldoc, metadata):
+def set_deme_count(xmldoc, metadata, deme_getter=default_deme_getter):
     "Updates the model specs based onthe number of demes in the data set."
-    demes = list(set(map(deme, metadata)))
+    demes = list(set(map(deme_getter, metadata)))
     demes.sort()
     deme_count = len(demes)
     mig_dim = (deme_count - 1) * deme_count / 2
@@ -137,21 +138,23 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('template', type=argparse.FileType('r'),
             help="""A template BEAST XML (presumably created by Beauti) ready insertion of an alignment and
-            discrete trait""")
-    parser.add_argument('-a', '--alignment')
+            discrete trait.""")
+    parser.add_argument('-a', '--alignment',
+            help="Replace alignment in beast file with this alignment; Fasta format.")
     parser.add_argument('-m', '--metadata', type=argparse.FileType('r'),
-            help="Should contain 'community' column referencing the deme")
+            help="Should contain 'community' column referencing the deme.")
     parser.add_argument('-s', '--samples', type=int_or_floatify,
-            help="Number of samples in output log file(s)")
+            help="Number of samples in output log file(s).")
     parser.add_argument('-d', '--deme-col',
-            help="Specifies the deme column for metadata", default='deme')
+            help="""Specifies the deme column for metadata; defaults to deme or community (whichever is present)
+            if not specified.""")
     parser.add_argument('-D', '--date-col',
-            help="If specified, will add a date specification to the output BEAST XML file")
+            help="If specified, will add a date specification to the output BEAST XML file.")
     parser.add_argument('-i', '--sampling-interval', type=int_or_floatify,
             help="""Number of chain states to simulate between successive states samples for logfiles. The
             total chain length is therefor samples * sampling_interval.""")
     parser.add_argument('beastfile', type=argparse.FileType('w'),
-            help="Output BEAST XML file")
+            help="Output BEAST XML file.")
     return parser.parse_args()
 
 
@@ -165,10 +168,12 @@ def main(args):
         set_alignment(xmldoc, alignment)
     if args.metadata:
         metadata = list(csv.DictReader(args.metadata))
-        set_deme(xmldoc, metadata)
+        # Set the deme getter
+        deme_getter = lambda row: row[args.deme_col] if args.deme_col else default_deme_getter
+        set_deme(xmldoc, metadata, deme_getter)
         # _could_ do something smart here where we look at which sequences in the XML file traitset that match
         # alignment passed in if _only_ alignment is passed in. Probably not worth it though...
-        set_deme_count(xmldoc, metadata)
+        set_deme_count(xmldoc, metadata, deme_getter)
         if args.date_col:
             set_date(xmldoc, metadata, args.date_col)
 
