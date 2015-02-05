@@ -168,6 +168,7 @@ Some notes to keep in mind if you specify your own BEAST template from scratch:
   here in this tool, and can not be assumed to remain as specified in your beastfile.
 * If you don't have tip dates, you can speed up your run by specifying a custom beast file where your fixed clock's rate isn't
   estimated but left constant. If you don't have any temporal data, these estimates won't mean anything anyway.
+* Main logfile must output to ``posterior.log`` and the trait trees to ``posterior.trait.trees``.
 
 .. _Tracer: http://tree.bio.ed.ac.uk/software/tracer/
 .. _Ancestral State Reconstruction tutorial: http://beast-classic.googlecode.com/files/ARv2.0.1.pdf
