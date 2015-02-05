@@ -22,6 +22,7 @@ def clear_children(node):
 
 
 def set_alignment(xmldoc, alignment):
+    """This function replaces the alignment data in xmldoc with that from sequences in alignment."""
     aln_node = xmldoc.find('data')
     # First clear out the old alignment sequences
     clear_children(aln_node)
@@ -39,20 +40,29 @@ def set_alignment(xmldoc, alignment):
 
 
 def get_data_id(xmldoc):
+    """The data set will have a given name, assigned by BEAUti, typically based on the named of the data file
+    loaded into it. This name gets referred to in a number of places (presumably so there can be a number of
+    partitions/datasets in an analysis), and is needed by other bits of code that do their thing."""
     return xmldoc.find(".//data[@name='alignment'][@id]").attrib['id']
 
 
 def deme(metarow):
+    """Returns the deme data from a dict; defaults to :deme, tries getting :community otherwise. Should really
+    refactor this so these are the _two_ defaults, but that the user can still specify via CLI."""
     return metarow.get('deme') or metarow.get('community')
 
 
 def set_deme(xmldoc, metadata):
+    """Sets the deme information of the xmldoc based on metadata, and using the `deme` function above."""
     trait_node = xmldoc.iter('traitSet').next()
     trait_string = ",\n".join([row['sequence'] + "=" + deme(row) for row in metadata])
     trait_node.text = trait_string
 
 
 def build_date_node(date_spec, data_id):
+    """Builds a node of date traits, given the date_spec string which is the actual string representation of
+    the sequence -> date mapping. Has to create a `taxa` subnode, and a `data` subnode of that, which points
+    to the data set in question via `idref`.""" 
     date_node = ET.Element('trait',
             id='dateTrait.t:' + data_id,
             spec='beast.evolution.tree.TraitSet',
@@ -68,10 +78,20 @@ def build_date_node(date_spec, data_id):
 
 
 def set_date(xmldoc, metadata, date_attr='date'):
+    """Builds a dateTrait node via `build_date_node` above, and inserts into the `.//state/tree` node.
+    However, this `tree` node already contains a `taxonset` node which has a `data` node, and this
+    `taxonset` node has the same id as the `taxa` node in the the date `trait` node. As such, the node that
+    _was_ present must be removed, so that we don't get a duplicate id error. Instead, we replace the old
+    taxonset node with one which has an `idref` pointing to the `taxa` node inside the `trait` node. This is
+    rather convoluted, and I'm not possible that some file with multiple datasets wouldn't break on this, but
+    this described strategy seems to work for now."""
+    # First get our tree node; we'll be adding the date data to this
     tree_node = xmldoc.find('.//state/tree')
-    data_id = get_data_id(xmldoc)
+    # Construct our trait string, just as we do for `set_deme`
     trait_string = ",\n".join([row['sequence'] + "=" + row[date_attr] for row in metadata])
-    # This builds the base date node; more things need to be added
+    # Build the date trait node, and carry out all the weird mucking to get the new `taxonset` node in, as
+    # described in the docstring
+    data_id = get_data_id(xmldoc)
     date_node = build_date_node(trait_string, data_id)
     old_taxonset = tree_node.find("./taxonset")
     tree_node.insert(0, date_node)
@@ -80,9 +100,10 @@ def set_date(xmldoc, metadata, date_attr='date'):
 
 
 def set_mcmc(xmldoc, samples, sampling_interval):
+    "Sets the MCMC chain settings (how often to log, how long to run, etc"
     run_node = xmldoc.find('run')
     # XXX Should really make it so that you only have to specify _one_, and it will find current value of
-    # other
+    # other so that chain length doesn't break.
     chain_length = samples * sampling_interval + 1
     run_node.set('chainLength', str(chain_length))
     loggers = run_node.findall('logger')
@@ -92,6 +113,7 @@ def set_mcmc(xmldoc, samples, sampling_interval):
 
 
 def set_deme_count(xmldoc, metadata):
+    "Updates the model specs based onthe number of demes in the data set."
     demes = list(set(map(deme, metadata)))
     demes.sort()
     deme_count = len(demes)
