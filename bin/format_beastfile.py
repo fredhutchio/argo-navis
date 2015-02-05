@@ -38,6 +38,10 @@ def set_alignment(xmldoc, alignment):
                     value=str(seq_record.seq)))
 
 
+def get_data_id(xmldoc):
+    return xmldoc.find(".//data[@name='alignment'][@id]").attrib['id']
+
+
 def deme(metarow):
     return metarow.get('deme') or metarow.get('community')
 
@@ -48,24 +52,37 @@ def set_deme(xmldoc, metadata):
     trait_node.text = trait_string
 
 
-def build_date_node(date_spec):
+def build_date_node(date_spec, data_id):
     date_node = ET.Element('trait',
-            id='dateTrait.t:trimmed',
+            id='dateTrait.t:' + data_id,
             spec='beast.evolution.tree.TraitSet',
             traitname='date')
     date_node.text = date_spec
+    taxa_node = ET.SubElement(date_node, 'taxa',
+            id='TaxonSet.' + data_id,
+            spec='TaxonSet')
+    _ = ET.SubElement(taxa_node, 'data',
+            idref=data_id,
+            name="alignment")
     return date_node
 
 
 def set_date(xmldoc, metadata, date_attr='date'):
-    tree_node = tree.find('.//state/tree')
+    tree_node = xmldoc.find('.//state/tree')
+    data_id = get_data_id(xmldoc)
     trait_string = ",\n".join([row['sequence'] + "=" + row[date_attr] for row in metadata])
-    date_node = build_date_node(trait_string)
+    # This builds the base date node; more things need to be added
+    date_node = build_date_node(trait_string, data_id)
+    old_taxonset = tree_node.find("./taxonset")
     tree_node.insert(0, date_node)
+    tree_node.remove(old_taxonset)
+    new_taxonset = ET.SubElement(tree_node, "taxonset", idref="TaxonSet."+data_id)
 
 
 def set_mcmc(xmldoc, samples, sampling_interval):
     run_node = xmldoc.find('run')
+    # XXX Should really make it so that you only have to specify _one_, and it will find current value of
+    # other
     chain_length = samples * sampling_interval + 1
     run_node.set('chainLength', str(chain_length))
     loggers = run_node.findall('logger')
@@ -104,7 +121,9 @@ def get_args():
             help="Should contain 'community' column referencing the deme")
     parser.add_argument('-s', '--samples', type=int_or_floatify,
             help="Number of samples in output log file(s)")
-    parser.add_argument('-d', '--date-col',
+    parser.add_argument('-d', '--deme-col',
+            help="Specifies the deme column for metadata", default='deme')
+    parser.add_argument('-D', '--date-col',
             help="If specified, will add a date specification to the output BEAST XML file")
     parser.add_argument('-i', '--sampling-interval', type=int_or_floatify,
             help="""Number of chain states to simulate between successive states samples for logfiles. The
@@ -131,7 +150,8 @@ def main(args):
         if args.date_col:
             set_date(xmldoc, metadata, args.date_col)
 
-    set_mcmc(xmldoc, args.samples, args.sampling_interval)
+    if args.samples or args.sampling_interval:
+        set_mcmc(xmldoc, args.samples, args.sampling_interval)
 
     # Write the output
     xmldoc.write(args.beastfile)
