@@ -159,6 +159,14 @@ early steps in Remco's tutorial in order to get BEAST Classic set up with BEAUti
 Frome there, you can download the default template, and load it by firing up BEAUti and going to "File > Load".
 Also, note that for additional assistance working with and tuning BEAST, the `BEAST homepage`_ is a great resource.
 
+Some notes to keep in mind if you specify your own BEAST template from scratch:
+
+* If you choose to specify the deme/community information directly in the your BEAST file and not apply the CSV or regular
+  expression data to set this, you must name your discrete trait `deme`, even if it's not deme, but something else, like
+  species name or tissue type.
+* Note that the chain length and sampling interval settings in your beastfile will get overriden by whatever is specified
+  here in this tool, and can not be assumed to remain as specified in your beastfile.
+
 .. _Tracer: http://tree.bio.ed.ac.uk/software/tracer/
 .. _Ancestral State Reconstruction tutorial: http://beast-classic.googlecode.com/files/ARv2.0.1.pdf
 .. _BEAST homepage: http://beast-classic.googlecode.com/files/ARv2.0.1.pdf
