@@ -1,0 +1,155 @@
+<tool id="ARGO_pact_run" name="Run PACT" version="1.0.0">
+  <description>Analyze Argo Navis BEAST run using PACT</description>
+  <macros>
+    <import>macros.xml</import>
+  </macros>
+  <command interpreter="bash">
+    pact.sh ${config}
+  </command>
+  <stdio>
+    <expand macro="basic_errors"/>
+  </stdio>
+  <inputs>
+
+    <!--XXX need to make this optional-->
+    <param name="posterior_trees" type="data" format="txt" label="BEAST trees"
+      help="This is the Posterior Trees output from Argo Navis BEAST. If pulling in from an external BEAST run, make sure 
+      to pull in the tree file with 'traits'."/>
+
+    <param name="custom_pact_settings" type="data" format="txt" label="Custom PACT spec"
+      help="Not required. You can specify a custom PACT file if you would like to perform some custom anlayses. If you do,
+      results will be place in the 'Raw output' folder/archive."/>
+
+    <conditional name="tip_selection">
+      <param name="tip_selection_method" type="select" label="Tip Selection Method"
+        help="You may optionally choose to restrict these PACT analyses to a subset of the sequences. By default, all tips
+        are included in the analysis, but this can be switched.">
+        <option value="all" selected="true">All tips (no subsetting)</option>
+        <option value="deme">Select By Deme</option>
+        <option value="tip_names">Space separated tip names</option>
+        <option value="tip_names_file">Tip name file</option>
+      </param>
+      <when value="deme">
+        <param name="deme_subset" type="text" value="" label="Deme" help="Restrict analyses to the specified deme"/>
+      </when>
+      <when value="tip_names">
+        <param name="tip_name_subset" type="text" value="" label="Tip names"
+          help="Restrict analyses to the specified tip names"/>
+      </when>
+      <when value="tip_names_file">
+        <param name="tip_name_subset_file" type="data" format="txt" label="Tip names file"
+          help="A file with one tip name per line"/>
+      </when>
+    </conditional>
+
+    <conditional name="color_specification">
+      <param name="color_specification_selector" type="select" label="Color specification">
+        <option value="colorbrewer" selected="true">Color brewer spec</option>
+        <option value="spec_file">Color spec file</option>
+      </param>
+      <when value="colorbrewer">
+        <param name="colorbrewer_pallet" type="text" value="RdBu" label="Deme and optionally date information"
+          help="A valid colorbrewer2 color scheme name. See http://colorbrewer2.org/ for details."/>
+      </when>
+      <when value="spec_file">
+        <param name="color_spec_file" type="data" format="csv" label="Color spec file"
+          help="This should be a CSV file with 'deme' and 'color' columns, specifying what color each deme should be
+          associated wtih"/>
+      </when>
+    </conditional>
+
+    <conditional name="time_range_specification">
+      <param name="time_range_specification_method" type="select" label="Time range">
+        <option value="all" selected="true">Don't restrict time range</option>
+        <option value="mrca">Time to MRCA of selected tips</option>
+        <option value="custom">Custom time range</option>
+      </param>
+      <when value="custom">
+        <param name="time_range_start" type="integer" value="1" label="Start time"
+          help="The age of the oldest ancestry which should be considered (as a positive number)"/>
+        <param name="time_range_end" type="integer" value="0" label="End time"
+          help="The age of the most recent ancestry which should be considered (as a non-negative number)"/>
+      </when>
+    </conditional>
+
+  </inputs>
+
+  <!--XXX Need to make sure we have the right formats here; in particular, there is probably a nexus format, and maybe the-->
+  <!--logfile would work with tabs, but maybe there are more specific types accepted for both these. Or maybe we should add-->
+  <!--them?-->
+  <outputs>
+    <!--XXX What type should I assign a pdf/svg/png/etc-->
+    <data name="figures" format="pdf" label="PACT figures"/>
+    <!--XXX What about archives? -->
+    <!--<data name="raw_output" format="zip" label="Misc PACT data"/>-->
+  </outputs>
+
+  <configfiles>
+    <!-- XXX Not sure if these deme specifications will actually work or not ??? -->
+    <configfile name="config">
+
+#if $alignment == ""
+ALIGNMENT_FLAG="-a ${alignment}"
+#else
+ALIGNMENT_FLAG=""
+#end if
+
+    </configfile>
+  </configfiles>
+
+  <!-- The contents of the help tag is parsed as reStructuredText. Please see
+       help-template.rst for examples of commonly-used sections in other Galaxy
+       tools. -->
+  <help>
+
+.. class:: infomark
+
+What it does
+------------
+
+This runs PACT for an Argo Navis analysis.
+PACT (Posterior Analysis of Coalescent Trees), as the name suggests, is a tool for analyzing the tree file output of an Argo
+Navis BEAST run.
+It is an impressive tool, with many powerful analytic features, but we'll only focus on a core subset in this wrapper of the tool.
+
+The key features of PACT that make it so powerful are its vast range of statistics and metrics which can be computed, coupled with
+it's ability to restrict these metrics to a subset of the tree ancestry, both in time and in tree tips.
+These features make it possible to ask very pointed questions out of a complicated data set.
+For instance, imagine you have virus sequences from a number of host species;
+You might want to find out what the ancestry looks like of the viruses in species A.
+In particular, you might want to know what population(s) the virus in species A was in just before ending there.
+With PACT, you can simply subset to the viruses in species A to invetigate this, and look at any number of statistics for them.
+
+While PACT has many different analyses and statistics you can perform, here we focus on a select few.
+We look at:
+
+* **Skyline proportions**: These look at the ancestral proportions associated with each deme as we look back towards the root.
+* **Migrate rates**: These are estimates with bounds of the rate of migration between each pair of demes.
+* **Maximum likelyhood reconstruction**: The most likley tree and acestral demestate history in the posterior.
+* **Other miscelaneous stats**: TMCA, etc.
+
+We also let you restrict the tree to any tip set or temporal range you like.
+
+If you would like to run other analyses, you can take a look at the `PACT documentation`_.
+While this tool doesn't support plotting functionality for more advanced analyses, you can place your own PACT file in this tool,
+get the results in the output zip file and do what you like with them.
+
+Output files
+------------
+
+This tool outputs two files:
+
+* **PACT figures**: A collection of figures representing the results for these analyses.
+* **All files**: A collection of any other files output by PACT.
+
+.. _PACT documentation: https://github.com/trvrb/PACT/blob/master/pact_manual.pdf?raw=true
+
+
+Citation
+--------
+
+Should cite the upcoming AstV paper and BEAST and Trevor's flu paper
+
+
+  </help>
+</tool>
