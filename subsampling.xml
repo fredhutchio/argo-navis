@@ -20,13 +20,15 @@
       </param>
       <when value="spec_file">
         <param name="deme_spec_file" type="data" format="csv" label="Deme information"/>
+        <param name="deme_column" type="text" label="Deme column" value="deme"
+          help="Column in CSV file to treat as the Deme column"/>
       </when>
       <when value="regexp">
         <param name="deme_regexp" type="text" label="Regular expression for extracting deme name"/>
       </when>
     </conditional>
 
-    <param name="subsampling_method" type="select" display="checkboxes" multiple="true" label="Subsampling method"
+    <param name="subsampling_method" type="select" display="radio" label="Subsampling method"
       help="Specify the subsampling method.
       Random attempts to account for sampling depth discrepancies between methods, while K-means attempts to correct for sampling bias.">
       <option value="random" selected="true">Random</option>
@@ -50,9 +52,16 @@
     <!-- XXX Not sure if these deme specifications will actually work or not ??? -->
     <configfile name="config">
 ALIGNMENT="${alignment}"
-DEME_SPECIFICATION_FILE="${deme_specification.spec_file}"
-DEME_SPECIFICATION_REGEX="${deme_specification.regex}"
 DEME_SPECIFICATION_SELECTOR="${deme_specification.deme_specification_selector}"
+#if $deme_specification.deme_specification_selector == "spec_file"
+DEME_SPECIFICATION_FILE="${deme_specification.deme_spec_file}"
+DEME_SPECIFICATION_REGEX=""
+DEME_COLUMN="${deme_specification.deme_column}"
+#else
+DEME_SPECIFICATION_FILE=""
+DEME_SPECIFICATION_REGEX="${deme_specification.deme_regex}"
+DEME_COLUMN="deme"
+#end if
 
 SUBSAMPLING_METHOD="${subsampling_method}"
 N_PER_DEME="${n_per_deme}"
