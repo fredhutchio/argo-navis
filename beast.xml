@@ -16,13 +16,18 @@
 
     <!--XXX Here assuming that either you enter deme/date with regexp, or with csv metadata, or directly through BEAST xml; no mixing-->
     <conditional name="meta_specification">
-      <param name="meta_specification_selector" type="select" label="Metadata specification">
+      <param name="meta_specification_selector" type="select" label="Metadata specification"
+        help="BEAST needs to know how sequences should be split up into groups, and if samples have dates associated
+        with them, how to get this data. You can either pass along a specification CSV file, or specify regular
+        expressions for extrating this data from sequence names.">
         <option value="spec_file" selected="true">Deme spec file</option>
         <option value="regexp">From sequence names</option>
         <option value="in_beastfile">Use mappings present in specified BEAST XML file</option>
       </param>
       <when value="spec_file">
-        <param name="metadata_file" type="data" format="csv" label="Deme and optionally date information"/>
+        <param name="metadata_file" type="data" format="csv" label="Metadata file"
+          help="CSV file specifying deme and (optionally) date data."/>
+        <!--XXX have to add fields here specifying what columns to grab-->
       </when>
       <!--XXX - Have to tune these regular expressions-->
       <when value="regexp">
