@@ -12,7 +12,8 @@
   <inputs>
 
     <!--XXX need to make this optional-->
-    <param name="alignment" type="data" format="fasta" label="Sequence alignment"/>
+    <param name="alignment" type="data" format="fasta" label="Sequence alignment" optional="true"
+      help="This is optional if you want to use the alignment in the BEAST file"/>
 
     <!--XXX Here assuming that either you enter deme/date with regexp, or with csv metadata, or directly through BEAST xml; no mixing-->
     <conditional name="meta_specification">
@@ -83,9 +84,9 @@
     <configfile name="config">
 
 #if $alignment == ""
-ALIGNMENT_FLAG="-a ${alignment}"
-#else
 ALIGNMENT_FLAG=""
+#else
+ALIGNMENT_FLAG="-a ${alignment}"
 #end if
 
 META_SPECIFICATION_SELECTOR="${meta_specification.meta_specification_selector}"

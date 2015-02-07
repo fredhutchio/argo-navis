@@ -41,13 +41,14 @@ format_beastfile.py $BEASTFILE $ALIGNMENT_FLAG $META_FLAG $SAMPLES_FLAG $SAMPLIN
 # XXX Not sure yet how we actually deal with the resume data...
 if [ ${RESUME_LOGFILE} == "" ]
 then
-  RESUME_FLAG="-resume"
-else
   RESUME_FLAG=""
+else
+  RESUME_FLAG="-resume"
 fi
 
 # XXX Also have to make sure here somewhere that we pass through the output file flags
 # How does galaxy actually handle that?
 beast "" beastfile.xml
+cp beastfile.xml $stuff
 
 
