@@ -78,7 +78,6 @@
   <!--logfile would work with tabs, but maybe there are more specific types accepted for both these. Or maybe we should add-->
   <!--them?-->
   <outputs>
-    <!--XXX What type should I assign a pdf/svg/png/etc-->
     <data name="figures" format="pdf" label="PACT figures"/>
     <!--XXX What about archives? -->
     <!--<data name="raw_output" format="zip" label="Misc PACT data"/>-->
