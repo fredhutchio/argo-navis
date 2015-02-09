@@ -3,8 +3,6 @@
 source $(dirname $0)/util.sh
 source $1
 
-export PATH=`dirname $0`/bin:$PATH
-
 if [ ${DEME_SPECIFICATION_SELECTOR} == "regexp" ]
 then
   # If we have a regexp, will need to create the specification file to pass along
