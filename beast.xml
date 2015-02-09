@@ -12,16 +12,15 @@
   <inputs>
 
 
-    <!-- BASIC BEASTFILE SPECIFICATION -->
-    <!-- ============================== -->
-    <param name="alignment" type="data" format="fasta" label="Sequence alignment" optional="true"
-      help="This is optional if you want to use the alignment in the BEAST file"/>
+    <!-- BASIC DATA SPECIFICATION -->
+    <!-- ======================== -->
+    <param name="alignment" type="data" format="fasta" label="Sequence alignment"
+      help="This is optional if you want to use the alignment in the BEAST file."/>
 
     <conditional name="metadata">
       <param name="specification" type="select" label="Metadata specification"
-        help="BEAST needs to know how sequences should be split up into groups, and if samples have dates associated
-        with them, how to get this data. You can either pass along a specification CSV file, or specify regular
-        expressions for extrating this data from sequence names.">
+        help="BEAST needs to know how sequences split into demes, and whether there is date information.
+        You can either specify a CSV metadata file, or regular expressions for extrating this data from sequence names.">
         <option value="file" selected="true">Metadata file</option>
         <option value="regexp">From sequence names</option>
         <option value="in_beastfile">Use mappings in BEAST XML file</option>
@@ -31,7 +30,7 @@
           help="CSV file specifying deme and (optionally) date data."/>
         <param name="deme_column" type="text" label="Deme column" value="deme"
           help="Column in CSV file to treat as the deme specification"/>
-        <param name="date_column" type="text" label="Deme column" value="" optional="true"
+        <param name="date_column" type="text" label="Date column" value="" optional="true"
           help="Column in CSV file to treat as the date data. If left blank, all tips are set to time 0 by BEAST."/>
       </when>
       <!--XXX - Have to tune these regular expressions-->
@@ -48,30 +47,40 @@
     </conditional>
 
     <param name="samples" type="integer" value="10000" label="Number of samples" min="100"
-      help="Number of samples to keep out of chain."/>
+      help="Number of samples to take."/>
     <!--XXX Will have to check to make sure logging frequency is the same between -resume runs-->
     <param name="sampling_interval" type="integer" value="1000" label="Sampling interval" min="1"
-      help="Number of states explored in chain between samples. Note that if doing a resume run, this number must be
-      the same as that of the prior run."/>
+      help="Number of states explored in chain between samples."/>
     <param name="random_seed" type="integer" value="" label="Random seed" optional="true"
       help="Random seed to be used in BEAST MCMC. Specifying and recording this value can aid in reproducibility."/>
 
 
     <!-- MANUAL BEASTFILE SPECIFICATION -->
     <!-- ============================== -->
-    <param name="beastfile_template" type="data" format="xml" label="BEAST file XML template" optional="true"
-      help="If all sequence, deme, and temporal data is present in this file, only the chain length settings above need
-      be specified. Any sequence, deme or temporal data specified above will be taken in preference to whatever is in
-      this file. Any customization of models or priors should be specified through this file. See below for details."/>
+    <conditional name="beastfile">
+      <param name="specification" type="select" label="BEAST file specification"
+        help="If you'd like to run a more custom analysis, you can specify your own BEAST file (see detailed help below).
+        Additionally, if you are performing a resume run, you will need to specify the BEAST file output by the previous run.">
+        <option value="default" selected="true">Default</option>
+        <option value="custom">Custom or resume</option>
+      </param>
+      <when value="default"/>
+      <when value="custom">
+        <param name="template" type="data" format="xml" label="BEAST file XML template" optional="true"
+          help="Note that any alignment or deme/date data specified above will override whatever is present in this file.
+          However, having this data specified in a custom file means you can forgo the inputs above."/>
+      </when>
+    </conditional>
 
 
     <!-- HERE THERE BE DOWNSAMPLING OPTIONS -->
     <!-- ================================== -->
     <conditional name="downsampling">
       <param name="method" type="select" display="radio" label="Downsampling method"
-        help="Downsampling let's set a maximum number of sequences per deme. This can help you
-        investigate issues of sampling bias and sampling depth. Random downsampling is recommended for
-        concerns relating to sampling depth, while K-means is recommended for addressing sampling bias.
+        help="Downsampling sets a maximum number of sequences per deme.
+        This can help you investigate issues of sampling bias and sampling depth.
+        Random downsampling is recommended for concerns relating to sampling depth, while K-means is recommended for
+        addressing sampling bias.
         Please see the help below for a more detailed information.">
         <option value="none" selected="true">None</option>
         <option value="random">Random</option>
@@ -99,9 +108,10 @@
     <!-- ================== -->
     <conditional name="resume">
       <param name="selector" type="select" display="radio" label="Resume from a previous run?"
-        help="If you have already run BEAST, and found that it did not run long enough (the mixing was poor), you can add the outputs
-        from your last run and resume your run from where you left off.
-        Note that this probably isn't worth doing if the first run did not take very long">
+        help="If you ran BEAST but found it didn't run long enough, you can resume your run from where you left off.
+        Note you will need to specify some of the previous run's outputs here and in the 'BEAST file specification' above,
+        and the only other parameters that will have any effect on the run will be the number of samples.
+        Note also this probably isn't worth doing if the previous run didn't take very long.">
         <option value="false" selected="true">No thanks</option>
         <option value="true">Yes please</option>
       </param>
@@ -109,14 +119,13 @@
         <!--Do nothing-->
       </when>
       <when value="true">
-        <param name="logfile" type="data" format="txt" label="Logfile from last run"/>
-        <param name="treefile" type="data" format="txt" label="Treefile from last run"/>
+        <param name="logfile" type="data" format="txt" label="Logfile from last run"
+          help="Cannot be the 'trimmed' output from previous run, but must be the full output."/>
+        <param name="treefile" type="data" format="txt" label="Treefile from last run"
+          help="As with the Logfile, cannot be the `trimmed` output."/>
         <param name="samples" type="integer" value="10000" label="Number of samples to keep" min="2"
-          help="When doing a resume run, the total number of samples selected can grow quite large.
-          This can lead to analysis tools like PACT and Tracer getting bogged down.
-          To address this, after performing a resume run, we trim the output data to this number of samples to make things more manageable.
-          However, for this to work, the sampling interval must be the same on all resume runs.
-          This means that if you do a resume run based on another resume run, you have to use the 'full output' log/tree files of this tool here."/>
+          help="With resume runs, the log and tree files can grow quite large, bogging down PACT and other analysis tools.
+          Therefore, after a resume run, 'trimmed' output files are created with this number of samples."/>
       </when>
     </conditional>
 
