@@ -11,31 +11,34 @@
   </stdio>
   <inputs>
 
-    <!--XXX need to make this optional-->
+
+    <!-- BASIC BEASTFILE SPECIFICATION -->
+    <!-- ============================== -->
     <param name="alignment" type="data" format="fasta" label="Sequence alignment" optional="true"
       help="This is optional if you want to use the alignment in the BEAST file"/>
 
-    <!--XXX Here assuming that either you enter deme/date with regexp, or with csv metadata, or directly through BEAST xml; no mixing-->
-    <conditional name="meta_specification">
-      <param name="meta_specification_selector" type="select" label="Metadata specification"
+    <conditional name="metadata">
+      <param name="specification" type="select" label="Metadata specification"
         help="BEAST needs to know how sequences should be split up into groups, and if samples have dates associated
         with them, how to get this data. You can either pass along a specification CSV file, or specify regular
         expressions for extrating this data from sequence names.">
-        <option value="spec_file" selected="true">Deme spec file</option>
+        <option value="file" selected="true">Metadata file</option>
         <option value="regexp">From sequence names</option>
-        <option value="in_beastfile">Use mappings present in specified BEAST XML file</option>
+        <option value="in_beastfile">Use mappings in BEAST XML file</option>
       </param>
-      <when value="spec_file">
-        <param name="metadata_file" type="data" format="csv" label="Metadata file"
+      <when value="file">
+        <param name="file" type="data" format="csv" label="Metadata file"
           help="CSV file specifying deme and (optionally) date data."/>
-        <!--XXX have to add fields here specifying what columns to grab-->
+        <param name="deme_column" type="text" label="Deme column" value="deme"
+          help="Column in CSV file to treat as the deme specification"/>
+        <param name="date_column" type="text" label="Deme column" value="" optional="true"
+          help="Column in CSV file to treat as the date data. If left blank, all tips are set to time 0 by BEAST."/>
       </when>
       <!--XXX - Have to tune these regular expressions-->
       <when value="regexp">
         <param name="deme_regexp" type="text" value="[^\s\|]+|(.+)" label="Deme name regular expression"
           help="Defaults to second value in a 2-ple or triple of '|' separated values."/>
-        <!--XXX make sure this is optional; also make sure that the clock rate specification forks on this-->
-        <param name="date_regexp" type="text" value="[^\s\|]+\|[^\s\|]+\|(.+)" label="Date regular expression"
+        <param name="date_regexp" type="text" value="[^\s\|]+\|[^\s\|]+\|(.+)" label="Date regular expression" optional="true"
           help="This regular expression should extract an integer value, which can be interpetted as a time value.
           Whether it is years, months, days (etc.) is up to you."/>
       </when>
@@ -44,79 +47,121 @@
       </when>
     </conditional>
 
-    <!--XXX Be able to refer to these as a collection of related settings?-->
-    <!--XXX - Add some help here giving time estimates and such-->
-    <param name="samples" type="integer" value="10000" label="Random seed" min="100"
+    <param name="samples" type="integer" value="10000" label="Number of samples" min="100"
       help="Number of samples to keep out of chain."/>
     <!--XXX Will have to check to make sure logging frequency is the same between -resume runs-->
-    <param name="sampling_interval" type="integer" value="1000" label="Random seed" min="1"
+    <param name="sampling_interval" type="integer" value="1000" label="Sampling interval" min="1"
       help="Number of states explored in chain between samples. Note that if doing a resume run, this number must be
       the same as that of the prior run."/>
+    <param name="random_seed" type="integer" value="" label="Random seed" optional="true"
+      help="Random seed to be used in BEAST MCMC. Specifying and recording this value can aid in reproducibility."/>
 
-    <!--XXX Is it possible to make the default template just a regular data set file? That would make it easy to download ph?-->
-    <!--Could it stil be linked to easily below?-->
-    <param name="beastfile_template" type="data" format="xml" label="BEAST file XML template"
+
+    <!-- MANUAL BEASTFILE SPECIFICATION -->
+    <!-- ============================== -->
+    <param name="beastfile_template" type="data" format="xml" label="BEAST file XML template" optional="true"
       help="If all sequence, deme, and temporal data is present in this file, only the chain length settings above need
       be specified. Any sequence, deme or temporal data specified above will be taken in preference to whatever is in
       this file. Any customization of models or priors should be specified through this file. See below for details."/>
 
-    <!--XXX Be able to refer to these as a collection of related settings?-->
-    <!--XXX need to make this optional, but also make sure both are together or errors-->
-    <param name="resume_logfile" type="data" format="txt" label="Logfile from last run; triggers -resume run"/>
-    <param name="resume_treefile" type="data" format="txt" label="Treefile from last run; triggers -resume run"/>
 
-    <!--XXX Really need to make this not require a value so it's random between multiple runs...-->
-    <param name="random_seed" type="integer" value="" label="Random seed" min="2"
-      help="Random seed to be used in BEAST MCMC. Specifying and recording this value can aid in reproducibility."/>
+    <!-- HERE THERE BE DOWNSAMPLING OPTIONS -->
+    <!-- ================================== -->
+    <conditional name="downsampling">
+      <param name="method" type="select" display="radio" label="Downsampling method"
+        help="Downsampling let's set a maximum number of sequences per deme. This can help you
+        investigate issues of sampling bias and sampling depth. Random downsampling is recommended for
+        concerns relating to sampling depth, while K-means is recommended for addressing sampling bias.
+        Please see the help below for a more detailed information.">
+        <option value="none" selected="true">None</option>
+        <option value="random">Random</option>
+        <option value="kmeans">K-means</option>
+      </param>
+      <when value="none">
+        <!--Do nothing-->
+      </when>
+      <when value="random">
+        <param name="k" type="integer" value="" label="N sequences" min="2"
+          help="Number of sequences to be taken per deme."/>
+        <param name="random_seed" type="integer" value="" label="Random seed"
+          help="Random seed to be used for sequence selections."/>
+      </when>
+      <when value="kmeans">
+        <param name="k" type="integer" value="" label="N sequences" min="2"
+          help="Number of sequences to be taken per deme."/>
+        <param name="random_seed" type="integer" value="" label="Random seed"
+          help="Random seed to be used for sequence selections."/>
+      </when>
+    </conditional>
+
+
+    <!-- RESUME RUN OPTIONS -->
+    <!-- ================== -->
+    <conditional name="resume">
+      <param name="selector" type="select" display="radio" label="Resume from a previous run?"
+        help="If you have already run BEAST, and found that it did not run long enough (the mixing was poor), you can add the outputs
+        from your last run and resume your run from where you left off.
+        Note that this probably isn't worth doing if the first run did not take very long">
+        <option value="false" selected="true">No thanks</option>
+        <option value="true">Yes please</option>
+      </param>
+      <when value="false">
+        <!--Do nothing-->
+      </when>
+      <when value="true">
+        <param name="logfile" type="data" format="txt" label="Logfile from last run"/>
+        <param name="treefile" type="data" format="txt" label="Treefile from last run"/>
+        <param name="samples" type="integer" value="10000" label="Number of samples to keep" min="2"
+          help="When doing a resume run, the total number of samples selected can grow quite large.
+          This can lead to analysis tools like PACT and Tracer getting bogged down.
+          To address this, after performing a resume run, we trim the output data to this number of samples to make things more manageable.
+          However, for this to work, the sampling interval must be the same on all resume runs.
+          This means that if you do a resume run based on another resume run, you have to use the 'full output' log/tree files of this tool here."/>
+      </when>
+    </conditional>
 
   </inputs>
 
-  <!--XXX Need to make sure we have the right formats here; in particular, there is probably a nexus format, and maybe the-->
-  <!--logfile would work with tabs, but maybe there are more specific types accepted for both these. Or maybe we should add-->
-  <!--them?-->
   <outputs>
-    <data name="logfile" format="txt" label="Argo BEAST logfile"/>
-    <data name="treefile" format="txt" label="Argo BEAST treefile"/>
+    <data name="logfile" format="tabular" label="Argo BEAST logfile"/>
+    <data name="treefile" format="nex" label="Argo BEAST treefile"/>
   </outputs>
 
   <configfiles>
     <!-- XXX Not sure if these deme specifications will actually work or not ??? -->
     <configfile name="config">
 
-#if $alignment == ""
-ALIGNMENT_FLAG=""
+ALIGNMENT="${alignment}"
+
+METADATA_SPECIFICATION="${metadata.specification}"
+#if $metadata.specification == "file"
+METADATA_FILE="${metadata.file}"
 #else
-ALIGNMENT_FLAG="-a ${alignment}"
-#end if
-
-META_SPECIFICATION_SELECTOR="${meta_specification.meta_specification_selector}"
-META_SPECIFICATION_FILE="${meta_specification.spec_file}"
-
-DEME_REGEX_FLAG="-d ${meta_specification.deme_regex}"
-
-#if $meta_specification.date_regex == ""
-DATE_REGEX_FLAG=""
-#else
-DATE_REGEX_FLAG="-t ${meta_specification.date_regex}"
+DEME_REGEX="${metadata.deme_regex}"
+DATE_REGEX="${metadata.date_regex}"
 #end if
 
 SAMPLES_FLAG="-s ${samples}"
 SAMPLING_INTERVAL_FLAG="-i ${sampling_interval}"
+RANDOM_SEED="${random_seed}"
 
 BEASTFILE_TEMPLATE="${beastfile_template}"
 
-RESUME_LOGFILE="${resume_logfile}"
-RESUME_TREEFILE="${resume_treefile}"
+RESUME="${resume.selector}"
+RESUME_LOGFILE="${resume.logfile}"
+RESUME_TREEFILE="${resume.treefile}"
+RESUME_SAMPLES="${resume.samples}"
 
-#if $meta_specification.date_regex == ""
-DATE_REGEX="-t ${meta_specification.date_regex}"
-#else
-DATE_REGEX=""
+DOWNSAMPLING_METHOD="${downsampling.method}"
+#if $downsampling.method != "none"
+DOWNSAMPLING_K="${downsampling.k}"
+DOWNSAMPLING_RANDOM_SEED="${downsampling.random_seed}"
 #end if
-RANDOM_SEED="${random_seed}"
+
 
 LOGFILE="${logfile}"
 TREEFILE="${treefile}"
+
     </configfile>
   </configfiles>
 

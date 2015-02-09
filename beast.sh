@@ -3,52 +3,95 @@
 source $(dirname $0)/util.sh
 source $1
 
-# XXX uh... is this right?
-export PATH=bin:argo_navis/bin:$PATH
 
+# COMPUTE METADATA IF NEEDED!
+# ===========================
 
-# Compute metadata if needed; otherwise leave alone
-if [ ${META_SPECIFICATION_SELECTOR} == "regexp" ]
+if [[ "$METADATA_SPECIFICATION" == "regexp" ]]
 then
+  # First make sure we actually have an alignment to operate on
+  if [[ "${ALIGNMENT}" == "" ]]
+  then
+    echo "Must have alignment in order to specify metadata via regular expression" > /dev/stderr
+    exit 1
+  fi
   # If we have a regexp, will need to create the specification file to pass along
-  metadata_from_seqnames.py ${DEME_REGEX_FLAG} ${DATE_REGEX_FLAG} \
-    ${ALIGNMENT} tmp_deme_spec.csv # XXX where should tmp live
-  META_SPECIFICATION_FILE=tmp_deme_spec.csv
+  if [[ "$DATE_REGEX" != "" ]]
+  then
+    DATE_REGEX_FLAG="-D $DATE_REGEX"
+  fi
+  metadata_from_seqnames.py -d "$DEME_REGEX_FLAG" ${DATE_REGEX_FLAG} \
+    ${ALIGNMENT} tmp_deme_spec.csv
+  METADATA_FILE=tmp_deme_spec.csv
 fi
 
-# Make a metadata flag we can pass into the format command
-if [ ${META_SPECIFICATION_FILE} == "" ]
+
+
+# HANDLE DOWNSAMPLING
+# ===================
+
+if [[ "$DOWNSAMPLING_METHOD" != "none" ]]
 then
-  # Assume that the metadata is already in the beastfile (XXX deal with errors if no specified beastfile)
-  META_FLAG=""
-else
+  if [[ "$METADATA_FILE" == "" || $ALIGNMENT == "" ]]
+  then
+    echo "Must specify deme and alignment data in order to downsample" > /dev/stdout
+    exit 1
+  fi
+  # This script does the downsampling
+  deme_downsample.py -m $DOWNSAMPLING_METHOD -k $DOWNSAMPLING_K -c $DEME_COLUMN \
+    $ALIGNMENT $METADATA_FILE \
+    $DOWNSAMPLED_ALIGNMENT $DOWNSAMPLED_METADATA
+  # Assign these to the unsampled variable names so the code below follows the same flow regardless
+  ALIGNMENT=$DOWNSAMPLED_ALIGNMENT
+  METADATA_FILE=$DOWNSAMPLED_METADATA
+fi
+
+
+
+# CONSTRUCT BEASTFILE AND RUN BEAST
+# =================================
+
+# Make a metadata flag we can pass into the format command
+if [[ "$METADATA_FILE" != "" ]]
+then
   # Then use either the file given to us, or the one we constructed from regexprs
-  # XXX How do we deal with making sure the regexp metadata parses correctly? Offer optional files out for debug?
   META_FLAG="-m $META_SPECIFICATION_FILE"
 fi
 
 # Set the default BEASTfile
-# XXX Will this actually work for "data" files?
-if [ ! ${BEASTFILE} == "" ]
+if [ "$BEASTFILE_TEMPLATE" != "" ]
 then
-  # XXX Where will this get called? Where is the best place to put this as updatable resource?
-  BEASTFILE=`readlink -f default_beastfile_template.xml`
+  # ARGO_TOOL_DIR gets defined in utils; magick sauce...
+  BEASTFILE=$ARGO_TOOL_DIR/default_beastfile_template.xml
 fi
 
 # Format our beastfile
 format_beastfile.py $BEASTFILE $ALIGNMENT_FLAG $META_FLAG $SAMPLES_FLAG $SAMPLING_INTERVAL_FLAG beastfile.xml
 
-# XXX Not sure yet how we actually deal with the resume data...
-if [ ${RESUME_LOGFILE} == "" ]
+if [[ "$RESUME_LOGFILE" != "" && "$RESUME_TREEFILE" != "" ]]
 then
-  RESUME_FLAG=""
-else
   RESUME_FLAG="-resume"
+  cp $RESUME_LOGFILE posterior.log
+  cp $RESUME_TREEFILE posterior.trait.trees
 fi
 
-# XXX Also have to make sure here somewhere that we pass through the output file flags
-# How does galaxy actually handle that?
-beast "" beastfile.xml
-cp beastfile.xml $stuff
+# Actually run BEAST and set the output vars to their locations
+beast $RESUME_FLAG beastfile.xml
+# XXX make sure format actually ensures these file locations don't change
+cp posterior.log $LOGFILE
+cp posterior.label.trees $TREEFILE
+
+
+
+# LOGFILE TRIMMING FOR RESUME RUNS
+# ================================
+
+if [[ "$RESUME_LOGFILE" != "" && "$RESUME_TREEFILE" != "" ]]
+then
+  # XXX Haven't hooked these outputs up yet
+  #posterior_subset.clj -t treefile -c $RESUME_SAMPLES $TREEFILE $SUBSET_TREEFILE
+  #posterior_subset.clj -t logfile -c $RESUME_SAMPLES $LOGFILE $SUBSET_LOGFILE
+  echo "Still in stub mode"
+fi
 
 
