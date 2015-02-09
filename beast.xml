@@ -154,12 +154,17 @@ SAMPLES_FLAG="-s ${samples}"
 SAMPLING_INTERVAL_FLAG="-i ${sampling_interval}"
 RANDOM_SEED="${random_seed}"
 
-BEASTFILE_TEMPLATE="${beastfile_template}"
+BEASTFILE_SPECIFICATION="${beastfile.specification}"
+#if $beastfile.specification == "custom"
+BEASTFILE_TEMPLATE="${beastfile.template}"
+#end if
 
-RESUME="${resume.selector}"
+RESUME_SELECTOR="${resume.selector}"
+#if $resume.selector == "true"
 RESUME_LOGFILE="${resume.logfile}"
 RESUME_TREEFILE="${resume.treefile}"
 RESUME_SAMPLES="${resume.samples}"
+#end if
 
 DOWNSAMPLING_METHOD="${downsampling.method}"
 #if $downsampling.method != "none"

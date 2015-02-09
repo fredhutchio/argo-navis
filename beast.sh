@@ -52,28 +52,52 @@ fi
 # =================================
 
 # Make a metadata flag we can pass into the format command
-if [[ "$METADATA_FILE" != "" ]]
+if [[ -n "$METADATA_FILE" ]]
 then
   # Then use either the file given to us, or the one we constructed from regexprs
-  META_FLAG="-m $META_SPECIFICATION_FILE"
+  META_FLAG="-m $METADATA_FILE"
+else
+  META_FLAG=""
+fi
+
+# Make a metadata flag we can pass into the format command
+if [[ -n "$ALIGNMENT" ]]
+then
+  # Then use either the file given to us, or the one we constructed from regexprs
+  ALIGNMENT_FLAG="-a $ALIGNMENT"
+else
+  ALIGNMENT_FLAG=""
 fi
 
 # Set the default BEASTfile
-if [ "$BEASTFILE_TEMPLATE" != "" ]
+if [ "$BEASTFILE_SPECIFICATION" == "default" ]
 then
   # ARGO_TOOL_DIR gets defined in utils; magick sauce...
-  BEASTFILE=$ARGO_TOOL_DIR/default_beastfile_template.xml
+  BEASTFILE_TEMPLATE=$ARGO_TOOL_DIR/default_beastfile_template.xml
 fi
 
-# Format our beastfile
-format_beastfile.py $BEASTFILE $ALIGNMENT_FLAG $META_FLAG $SAMPLES_FLAG $SAMPLING_INTERVAL_FLAG beastfile.xml
-
-if [[ "$RESUME_LOGFILE" != "" && "$RESUME_TREEFILE" != "" ]]
+# Fork on a bunch of things based on whether this is a resume run or not
+if [ "$RESUME_SELECTOR" == "true" ]
 then
+  # There should be a specified beastfile if we're resuming, otherwise raise
+  if [ "$BEASTFILE_SPECIFICATION" == "default" ]
+  then
+    echo "Must specify the beastfile output by last run if doing a resume run" > /dev/stdout
+    exit 1
+  fi
+  # Take care of getting things set up for proper formatting and resuming
+  FORMAT_ARGS="$SAMPLES_FLAG" # We don't want to accept any beastfile modifications except samples
   RESUME_FLAG="-resume"
   cp $RESUME_LOGFILE posterior.log
   cp $RESUME_TREEFILE posterior.trait.trees
+else
+  # Otherwise, set the full flag collection
+  RESUME_FLAG=""
+  FORMAT_ARGS="$ALIGNMENT_FLAG $META_FLAG $SAMPLES_FLAG $SAMPLING_INTERVAL_FLAG"
 fi
+
+# Format our beastfile
+format_beastfile.py $BEASTFILE_TEMPLATE $FORMAT_ARGS beastfile.xml
 
 # Actually run BEAST and set the output vars to their locations
 beast $RESUME_FLAG beastfile.xml
@@ -86,7 +110,7 @@ cp posterior.label.trees $TREEFILE
 # LOGFILE TRIMMING FOR RESUME RUNS
 # ================================
 
-if [[ "$RESUME_LOGFILE" != "" && "$RESUME_TREEFILE" != "" ]]
+if [ "$RESUME_SELECTOR" == "true" ]
 then
   # XXX Haven't hooked these outputs up yet
   #posterior_subset.clj -t treefile -c $RESUME_SAMPLES $TREEFILE $SUBSET_TREEFILE
