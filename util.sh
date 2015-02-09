@@ -55,3 +55,9 @@ set -u
 
 START_TIME=$(timer)
 trap on_exit EXIT
+
+# Custom to this tool; add the bin directory of the argo navis tool to path, and create an accessor for data
+# in it
+export ARGO_TOOL_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+export PATH=ARGO_TOOL_DIR:$PATH
+
