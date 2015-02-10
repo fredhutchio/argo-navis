@@ -92,13 +92,13 @@
       <when value="random">
         <param name="k" type="integer" value="" label="N sequences" min="2"
           help="Number of sequences to be taken per deme."/>
-        <param name="random_seed" type="integer" value="" label="Random seed"
+        <param name="random_seed" type="integer" value="" label="Random seed" optional="true"
           help="Random seed to be used for sequence selections."/>
       </when>
       <when value="kmeans">
         <param name="k" type="integer" value="" label="N sequences" min="2"
           help="Number of sequences to be taken per deme."/>
-        <param name="random_seed" type="integer" value="" label="Random seed"
+        <param name="random_seed" type="integer" value="" label="Random seed" optional="true"
           help="Random seed to be used for sequence selections."/>
       </when>
     </conditional>
@@ -132,8 +132,14 @@
   </inputs>
 
   <outputs>
-    <data name="logfile" format="tabular" label="Argo BEAST logfile"/>
-    <data name="treefile" format="nex" label="Argo BEAST treefile"/>
+    <data name="logfile" format="tabular" label="BEAST logfile"/>
+    <data name="treefile" format="nex" label="BEAST treefile"/>
+    <data name="downsampled_alignment" format="fasta" label="Downsampled alignment">
+      <filter>downsampling['method'] != "none"</filter>
+    </data>
+    <data name="downsampled_metadata" format="csv" label="Downsampled metadata">
+      <filter>downsampling['method'] != "none" and metadata['specification'] == "file"</filter>
+    </data>
   </outputs>
 
   <configfiles>
@@ -175,12 +181,20 @@ RESUME_SAMPLES="${resume.samples}"
 DOWNSAMPLING_METHOD="${downsampling.method}"
 #if $downsampling.method != "none"
 DOWNSAMPLING_K="${downsampling.k}"
+#if str($downsampling.random_seed) != "None"
 DOWNSAMPLING_RANDOM_SEED="${downsampling.random_seed}"
+#end if
 #end if
 
 
 LOGFILE="${logfile}"
 TREEFILE="${treefile}"
+#if $downsampling.method != "none"
+DOWNSAMPLED_ALIGNMENT="${downsampled_alignment}"
+#if $metadata.specification == "file"
+DOWNSAMPLED_METADATA="${downsampled_metadata}"
+#end if
+#end if
 
     </configfile>
   </configfiles>

@@ -42,10 +42,15 @@ then
   # This script does the downsampling
   deme_downsample.py -m $DOWNSAMPLING_METHOD -k $DOWNSAMPLING_K -c $DEME_COLUMN \
     $ALIGNMENT $METADATA_FILE \
-    $DOWNSAMPLED_ALIGNMENT $DOWNSAMPLED_METADATA
+    $DOWNSAMPLED_ALIGNMENT downsampled_metadata.csv
   # Assign these to the unsampled variable names so the code below follows the same flow regardless
   ALIGNMENT=$DOWNSAMPLED_ALIGNMENT
-  METADATA_FILE=$DOWNSAMPLED_METADATA
+  METADATA_FILE=downsampled_metadata.csv
+  # If we are downsampling and specified a metadata file, make sure to return a downsampled_metadata file
+  if [[ $METADATA_SPECIFICATION == "file" ]]
+  then
+    cp downsampled_metadata.csv $DOWNSAMPLED_METADATA
+  fi
 fi
 
 
@@ -105,9 +110,6 @@ fi
 
 # Format our beastfile
 format_beastfile.py $BEASTFILE_TEMPLATE $FORMAT_ARGS beastfile.xml
-
-echo "This is the mark of the beast:"
-which beast
 
 # Actually run BEAST and set the output vars to their locations
 /home/csmall/local/bin/beast $RESUME_FLAG beastfile.xml # The manual path is because matsengrp's beast is v1
