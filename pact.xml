@@ -16,18 +16,24 @@
       help="This should be the 'BEAST treefile' from your most recent run of BEAST.
       If you did a 'Resume' run, you should use the 'Trimmed' treefile."/>
 
+    <param name="figures_title" type="text" label="Figures title" value="Argo Navis PACT Results"
+      help="This string will be set as the title of the PDF figure file returned by this tool.
+      Feel free to customize to help you keep track of your files/figures."/>
+
     <conditional name="tip_selection">
       <param name="method" type="select" label="Tip selection method"
         help="You may optionally choose to restrict these PACT analyses to a subset of the sequences.
         By default, all tips are included in the analysis.">
         <option value="all" selected="true">All tips (no subsetting)</option>
-        <option value="deme">Select By Deme</option>
+        <!--<option value="deme">Select By Deme</option>-->
         <option value="names">Space separated tip names</option>
         <option value="file">Tip name file</option>
       </param>
-      <when value="deme">
-        <param name="deme" type="text" value="" label="Deme" help="Restrict analyses to the specified deme."/>
-      </when>
+      <!--<when value="deme">-->
+        <!--<param name="deme" type="text" value="" label="Deme" help="Restrict analyses to the specified deme."/>-->
+        <!--<param name="metadata" type="data" format="csv" label="Metadata"-->
+          <!--help="This tool will need to know which "/>-->
+      <!--</when>-->
       <when value="names">
         <param name="tip_name" type="text" value="" label="Tip names"
           help="Restrict analyses to the specified tip names (space separated)."/>
@@ -91,9 +97,12 @@
 
 TREEFILE="${treefile}"
 
+FIGURES_TITLE="${figures_title}"
+
 TIP_SELECTION_METHOD="${tip_selection.method}"
 #if $tip_selection.method == "deme"
 DEME="${tip_selection.deme}"
+METADATA="${tip_selection.metadata}"
 #else if $tip_selection.method == "names"
 TIP_NAMES="${tip_selection.names}"
 #else if $tip_selection.method == "file"
@@ -101,7 +110,7 @@ TIP_FILE="${tip_selection.names}"
 #end if
 
 TIME_RANGE_SELECTOR="${time_range.selector}"
-#if ${time_range.selector} == "custom"
+#if $time_range.selector == "custom"
 TIME_RANGE_START="${time_range.start}"
 TIME_RANGE_END="${time_range.end}"
 #end if
