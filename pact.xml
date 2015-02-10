@@ -12,85 +12,111 @@
   <inputs>
 
     <!--XXX need to make this optional-->
-    <param name="posterior_trees" type="data" format="txt" label="BEAST trees"
-      help="This is the Posterior Trees output from Argo Navis BEAST. If pulling in from an external BEAST run, make sure 
-      to pull in the tree file with 'traits'."/>
-
-    <param name="custom_pact_settings" type="data" format="txt" label="Custom PACT spec"
-      help="Not required. You can specify a custom PACT file if you would like to perform some custom anlayses. If you do,
-      results will be place in the 'Raw output' folder/archive."/>
+    <param name="treefile" type="data" format="txt" label="BEAST treefile"
+      help="This should be the 'BEAST treefile' from your most recent run of BEAST.
+      If you did a 'Resume' run, you should use the 'Trimmed' treefile."/>
 
     <conditional name="tip_selection">
-      <param name="tip_selection_method" type="select" label="Tip Selection Method"
-        help="You may optionally choose to restrict these PACT analyses to a subset of the sequences. By default, all tips
-        are included in the analysis, but this can be switched.">
+      <param name="method" type="select" label="Tip selection method"
+        help="You may optionally choose to restrict these PACT analyses to a subset of the sequences.
+        By default, all tips are included in the analysis.">
         <option value="all" selected="true">All tips (no subsetting)</option>
         <option value="deme">Select By Deme</option>
-        <option value="tip_names">Space separated tip names</option>
-        <option value="tip_names_file">Tip name file</option>
+        <option value="names">Space separated tip names</option>
+        <option value="file">Tip name file</option>
       </param>
       <when value="deme">
-        <param name="deme_subset" type="text" value="" label="Deme" help="Restrict analyses to the specified deme"/>
+        <param name="deme" type="text" value="" label="Deme" help="Restrict analyses to the specified deme."/>
       </when>
-      <when value="tip_names">
-        <param name="tip_name_subset" type="text" value="" label="Tip names"
-          help="Restrict analyses to the specified tip names"/>
+      <when value="names">
+        <param name="tip_name" type="text" value="" label="Tip names"
+          help="Restrict analyses to the specified tip names (space separated)."/>
       </when>
-      <when value="tip_names_file">
-        <param name="tip_name_subset_file" type="data" format="txt" label="Tip names file"
-          help="A file with one tip name per line"/>
-      </when>
-    </conditional>
-
-    <conditional name="color_specification">
-      <param name="color_specification_selector" type="select" label="Color specification">
-        <option value="colorbrewer" selected="true">Color brewer spec</option>
-        <option value="spec_file">Color spec file</option>
-      </param>
-      <when value="colorbrewer">
-        <param name="colorbrewer_pallet" type="text" value="RdBu" label="Deme and optionally date information"
-          help="A valid colorbrewer2 color scheme name. See http://colorbrewer2.org/ for details."/>
-      </when>
-      <when value="spec_file">
-        <param name="color_spec_file" type="data" format="csv" label="Color spec file"
-          help="This should be a CSV file with 'deme' and 'color' columns, specifying what color each deme should be
-          associated wtih"/>
+      <when value="file">
+        <param name="file" type="data" format="txt" label="Tip names file"
+          help="A file with one tip name per line."/>
       </when>
     </conditional>
 
-    <conditional name="time_range_specification">
-      <param name="time_range_specification_method" type="select" label="Time range">
+    <conditional name="time_range">
+      <param name="selector" type="select" label="Time range"
+        help="As with the Tip selection, you have the choice of restricting the anlayses to a particular time
+        range wihtin the tree.">
         <option value="all" selected="true">Don't restrict time range</option>
         <option value="mrca">Time to MRCA of selected tips</option>
         <option value="custom">Custom time range</option>
       </param>
       <when value="custom">
-        <param name="time_range_start" type="integer" value="1" label="Start time"
-          help="The age of the oldest ancestry which should be considered (as a positive number)"/>
-        <param name="time_range_end" type="integer" value="0" label="End time"
-          help="The age of the most recent ancestry which should be considered (as a non-negative number)"/>
+        <param name="start" type="float" value="1.0" label="Start time"
+          help="The age of the oldest ancestry which should be considered (as a positive number)."/>
+        <param name="end" type="float" value="0.0" label="End time"
+          help="The age of the most recent ancestry which should be considered (as a non-negative number)."/>
       </when>
     </conditional>
 
+    <conditional name="color">
+      <param name="selector" type="select" label="Color specification"
+        help="By default, the colors used in plots are automatically chosen for you.
+        However, you can either specify your own semi-automatic color scheme using Colorbrewer, or
+        for full control a CSV file mapping demes to colors.">
+        <option value="brewer" selected="true">Color brewer spec</option>
+        <option value="file">Color spec file</option>
+      </param>
+      <when value="brewer">
+        <param name="brewer" type="text" value="RdBu" label="Deme and optionally date information"
+          help="A valid colorbrewer2 color scheme name. See http://colorbrewer2.org/ for details."/>
+      </when>
+      <when value="file">
+        <param name="file" type="data" format="csv" label="Color spec file"
+          help="CSV file with 'deme' and 'color' columns, specifying what color (as RGB) each deme should be associated with.
+          Note, the default color scheme is both highly contrast and friendly for most color-blind individuals."/>
+      </when>
+    </conditional>
+
+    <param name="custom_pact_settings" type="data" format="txt" label="Custom PACT spec" optional="true"
+      help="Not required. You can specify a custom PACT file if you would like to perform some custom anlayses.
+      If you do, results will be place in the 'Full data' folder/archive."/>
+
   </inputs>
 
-  <!--XXX Need to make sure we have the right formats here; in particular, there is probably a nexus format, and maybe the-->
-  <!--logfile would work with tabs, but maybe there are more specific types accepted for both these. Or maybe we should add-->
-  <!--them?-->
   <outputs>
     <data name="figures" format="pdf" label="PACT figures"/>
-    <!--XXX What about archives? -->
-    <!--<data name="raw_output" format="zip" label="Misc PACT data"/>-->
+    <data name="full_data" format="txt" label="Full data">
+      <discover_datasets pattern="__designation__" ext="txt" directory="raw_data" visible="true"/>
+    </data>
   </outputs>
 
   <configfiles>
-    <!-- XXX Not sure if these deme specifications will actually work or not ??? -->
     <configfile name="config">
 
-#if $alignment == ""
-ALIGNMENT_FLAG="-a ${alignment}"
+TREEFILE="${treefile}"
+
+TIP_SELECTION_METHOD="${tip_selection.method}"
+#if $tip_selection.method == "deme"
+DEME="${tip_selection.deme}"
+#else if $tip_selection.method == "names"
+TIP_NAMES="${tip_selection.names}"
+#else if $tip_selection.method == "file"
+TIP_FILE="${tip_selection.names}"
+#end if
+
+TIME_RANGE_SELECTOR="${time_range.selector}"
+#if ${time_range.selector} == "custom"
+TIME_RANGE_START="${time_range.start}"
+TIME_RANGE_END="${time_range.end}"
+#end if
+
+COLOR_SELECTOR="${color.selector}"
+#if $color.selector == "brewer"
+COLOR_BREWER="${color.brewer}"
 #else
-ALIGNMENT_FLAG=""
+COLOR_FILE="${color.file}"
+#end if
+
+#if str($custom_pact_settings) != "None"
+CUSTOM_PACT_SETTINGS="${custom_pact_settings}"
+#else
+CUSTOM_PACT_SETTINGS=""
 #end if
 
     </configfile>
