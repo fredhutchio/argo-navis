@@ -7,7 +7,7 @@ source $1
 # COMPUTE METADATA IF NEEDED!
 # ===========================
 
-if [[ $METADATA_SPECIFICATION == "regexp" ]]
+if [[ $METADATA_SPECIFICATION == "regex" ]]
 then
   # First make sure we actually have an alignment to operate on
   if [[ ${ALIGNMENT} == "" ]]
@@ -15,7 +15,7 @@ then
     echo "Must have alignment in order to specify metadata via regular expression" > /dev/stderr
     exit 1
   fi
-  # If we have a regexp, will need to create the specification file to pass along
+  # If we have a regex, will need to create the specification file to pass along
   if [[ $DATE_REGEX != "" ]]
   then
     DATE_REGEX_FLAG="-D $DATE_REGEX"
@@ -109,10 +109,10 @@ else
 fi
 
 # Format our beastfile
-format_beastfile.py $BEASTFILE_TEMPLATE $FORMAT_ARGS beastfile.xml
+format_beastfile.py $BEASTFILE_TEMPLATE $FORMAT_ARGS $FORMATTED_BEASTFILE
 
 # Actually run BEAST and set the output vars to their locations
-/home/csmall/local/bin/beast $RESUME_FLAG beastfile.xml # The manual path is because matsengrp's beast is v1
+/home/csmall/local/bin/beast $RESUME_FLAG $FORMATTED_BEASTFILE # The manual path is because matsengrp's beast is v1
 
 # XXX make sure format actually ensures these file locations don't change
 # Copy files over to the locations Galaxy has specified for them
@@ -127,8 +127,8 @@ cp posterior.trait.trees $TREEFILE
 if [ $RESUME_SELECTOR == "true" ]
 then
   # XXX Haven't hooked these outputs up yet
-  #posterior_subset.clj -t treefile -c $RESUME_SAMPLES $TREEFILE $SUBSET_TREEFILE
-  #posterior_subset.clj -t logfile -c $RESUME_SAMPLES $LOGFILE $SUBSET_LOGFILE
+  posterior_subset.clj -t logfile -c $RESUME_SAMPLES $LOGFILE $TRIMMED_LOGFILE
+  posterior_subset.clj -t treefile -c $RESUME_SAMPLES $TREEFILE $TRIMMED_TREEFILE
   echo "Still in stub mode"
 fi
 

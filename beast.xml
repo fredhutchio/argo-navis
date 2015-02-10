@@ -22,7 +22,7 @@
         help="BEAST needs to know how sequences split into demes, and whether there is date information.
         You can either specify a CSV metadata file, or regular expressions for extrating this data from sequence names.">
         <option value="file" selected="true">Metadata file</option>
-        <option value="regexp">From sequence names</option>
+        <option value="regex">From sequence names</option>
         <option value="in_beastfile">Use mappings in BEAST XML file</option>
       </param>
       <when value="file">
@@ -34,10 +34,10 @@
           help="Column in CSV file to treat as the date data. If left blank, all tips are set to time 0 by BEAST."/>
       </when>
       <!--XXX - Have to tune these regular expressions-->
-      <when value="regexp">
-        <param name="deme_regexp" type="text" value="[^\s\|]+|(.+)" label="Deme name regular expression"
+      <when value="regex">
+        <param name="deme_regex" type="text" value="[^\s\|]+|(.+)" label="Deme name regular expression"
           help="Defaults to second value in a 2-ple or triple of '|' separated values."/>
-        <param name="date_regexp" type="text" value="[^\s\|]+\|[^\s\|]+\|(.+)" label="Date regular expression" optional="true"
+        <param name="date_regex" type="text" value="[^\s\|]+\|[^\s\|]+\|(.+)" label="Date regular expression" optional="true"
           help="This regular expression should extract an integer value, which can be interpetted as a time value.
           Whether it is years, months, days (etc.) is up to you."/>
       </when>
@@ -66,7 +66,7 @@
       </param>
       <when value="default"/>
       <when value="custom">
-        <param name="template" type="data" format="xml" label="BEAST file XML template" optional="true"
+        <param name="template" type="data" format="xml" label="BEAST file XML template"
           help="Note that any alignment or deme/date data specified above will override whatever is present in this file.
           However, having this data specified in a custom file means you can forgo the inputs above."/>
       </when>
@@ -134,11 +134,18 @@
   <outputs>
     <data name="logfile" format="tabular" label="BEAST logfile"/>
     <data name="treefile" format="nex" label="BEAST treefile"/>
+    <data name="formatted_beastfile" format="xml" label="BEAST config file"/>
     <data name="downsampled_alignment" format="fasta" label="Downsampled alignment">
       <filter>downsampling['method'] != "none"</filter>
     </data>
     <data name="downsampled_metadata" format="csv" label="Downsampled metadata">
       <filter>downsampling['method'] != "none" and metadata['specification'] == "file"</filter>
+    </data>
+    <data name="trimmed_logfile" format="tabular" label="Trimmed BEAST treefile">
+      <filter>resume['selector'] == "true"</filter>
+    </data>
+    <data name="trimmed_treefile" format="nex" label="Trimmed BEAST treefile">
+      <filter>resume['selector'] == "true"</filter>
     </data>
   </outputs>
 
@@ -187,13 +194,21 @@ DOWNSAMPLING_RANDOM_SEED="${downsampling.random_seed}"
 #end if
 
 
+
 LOGFILE="${logfile}"
 TREEFILE="${treefile}"
+FORMATTED_BEASTFILE="${formatted_beastfile}"
+
 #if $downsampling.method != "none"
 DOWNSAMPLED_ALIGNMENT="${downsampled_alignment}"
 #if $metadata.specification == "file"
 DOWNSAMPLED_METADATA="${downsampled_metadata}"
 #end if
+#end if
+
+#if $resume.selector == "true"
+TRIMMED_LOGFILE="${trimmed_logfile}"
+TRIMMED_TREEFILE="${trimmed_treefile}"
 #end if
 
     </configfile>
