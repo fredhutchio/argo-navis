@@ -100,6 +100,15 @@ def set_date(xmldoc, metadata, date_attr='date'):
     new_taxonset = ET.SubElement(tree_node, "taxonset", idref="TaxonSet."+data_id)
 
 
+def get_current_interval(xmldoc):
+    run_node = xmldoc.find('run')
+    loggers = run_node.findall('logger')
+    intervals = list(set([int(l.get('logEvery')) for l in loggers if l.get('id') != 'screenlog']))
+    if len(intervals) > 1:
+        raise "Cannot get an interval for this xml doc; there are multiple such values"
+    return intervals[0]
+
+
 def set_mcmc(xmldoc, samples, sampling_interval):
     "Sets the MCMC chain settings (how often to log, how long to run, etc"
     run_node = xmldoc.find('run')
@@ -178,7 +187,8 @@ def main(args):
             set_date(xmldoc, metadata, args.date_col)
 
     if args.samples or args.sampling_interval:
-        set_mcmc(xmldoc, args.samples, args.sampling_interval)
+        interval = args.sampling_interval if args.sampling_interval else get_current_interval(xmldoc)
+        set_mcmc(xmldoc, args.samples, interval)
 
     # Write the output
     xmldoc.write(args.beastfile)
