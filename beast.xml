@@ -123,6 +123,7 @@
           help="Cannot be the 'trimmed' output from previous run, but must be the full output."/>
         <param name="treefile" type="data" format="txt" label="Treefile from last run"
           help="As with the Logfile, cannot be the `trimmed` output."/>
+        <param name="statefile" type="data" format="txt" label="State file from previous run."/>
         <param name="samples" type="integer" value="10000" label="Number of samples to keep" min="2"
           help="With resume runs, the log and tree files can grow quite large, bogging down PACT and other analysis tools.
           Therefore, after a resume run, 'trimmed' output files are created with this number of samples."/>
@@ -135,13 +136,14 @@
     <data name="logfile" format="tabular" label="BEAST logfile"/>
     <data name="treefile" format="nex" label="BEAST treefile"/>
     <data name="formatted_beastfile" format="xml" label="BEAST config file"/>
+    <data name="statefile" format="text" label="BEAST state file"/>
     <data name="downsampled_alignment" format="fasta" label="Downsampled alignment">
       <filter>downsampling['method'] != "none"</filter>
     </data>
     <data name="downsampled_metadata" format="csv" label="Downsampled metadata">
       <filter>downsampling['method'] != "none" and metadata['specification'] == "file"</filter>
     </data>
-    <data name="trimmed_logfile" format="tabular" label="Trimmed BEAST treefile">
+    <data name="trimmed_logfile" format="tabular" label="Trimmed BEAST logfile">
       <filter>resume['selector'] == "true"</filter>
     </data>
     <data name="trimmed_treefile" format="nex" label="Trimmed BEAST treefile">
@@ -182,6 +184,7 @@ RESUME_SELECTOR="${resume.selector}"
 #if $resume.selector == "true"
 RESUME_LOGFILE="${resume.logfile}"
 RESUME_TREEFILE="${resume.treefile}"
+RESUME_STATEFILE="${resume.statefile}"
 RESUME_SAMPLES="${resume.samples}"
 #end if
 
@@ -198,6 +201,7 @@ DOWNSAMPLING_RANDOM_SEED="${downsampling.random_seed}"
 LOGFILE="${logfile}"
 TREEFILE="${treefile}"
 FORMATTED_BEASTFILE="${formatted_beastfile}"
+STATEFILE="${statefile}"
 
 #if $downsampling.method != "none"
 DOWNSAMPLED_ALIGNMENT="${downsampled_alignment}"

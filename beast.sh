@@ -97,6 +97,8 @@ then
   RESUME_FLAG="-resume"
   cp $RESUME_LOGFILE posterior.log
   cp $RESUME_TREEFILE posterior.trait.trees
+  # We assure this state location works by renaming the beastfile to beastfile.xml later
+  cp $RESUME_STATEFILE beastfile.xml.state
 else
   # Otherwise, set the full flag collection
   RESUME_FLAG=""
@@ -112,12 +114,18 @@ fi
 format_beastfile.py $BEASTFILE_TEMPLATE $FORMAT_ARGS $FORMATTED_BEASTFILE
 
 # Actually run BEAST and set the output vars to their locations
-/home/csmall/local/bin/beast $RESUME_FLAG $FORMATTED_BEASTFILE # The manual path is because matsengrp's beast is v1
+cp $FORMATTED_BEASTFILE beastfile.xml
+/home/csmall/local/bin/beast $RESUME_FLAG beastfile.xml # The manual path is because matsengrp's beast is v1
 
 # XXX make sure format actually ensures these file locations don't change
 # Copy files over to the locations Galaxy has specified for them
 cp posterior.log $LOGFILE
 cp posterior.trait.trees $TREEFILE
+echo "XXXX"
+readlink -f .
+ls -l . | grep state
+cp beastfile.xml.state $STATEFILE
+#cp posterior.log.state $STATEFILE
 
 
 
