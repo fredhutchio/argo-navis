@@ -145,6 +145,12 @@ ALIGNMENT="${alignment}"
 METADATA_SPECIFICATION="${metadata.specification}"
 #if $metadata.specification == "file"
 METADATA_FILE="${metadata.file}"
+DEME_COLUMN="${metadata.deme_column}"
+#if str($metadata.date_column) != "None"
+DATE_COLUMN="${metadata.date_column}"
+#else
+DATE_COLUMN=""
+#end if
 #else
 DEME_REGEX="${metadata.deme_regex}"
 DATE_REGEX="${metadata.date_regex}"
