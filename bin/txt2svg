@@ -1,0 +1,45 @@
+#!/usr/bin/env Rscript
+
+library(argparse)
+library(ggplot2)
+
+default.font.size <- 5
+
+parser <- ArgumentParser()
+parser$add_argument('input')
+parser$add_argument('-s', '--font-size', type="double", default=default.font.size)
+parser$add_argument('output')
+args <- parser$parse_args()
+
+
+if (args$input == '-') {
+  text.lines <- scan("stdin", what=character(), blank.lines.skip=T, sep="\n")
+} else {
+  text <- readChar(args$input, file.info(args$input)$size)
+  text.lines <- strsplit(text, "\\n")[[1]]
+}
+
+data <- data.frame(text=text.lines, x=0, y=length(text.lines):1)
+data$length <- nchar(text.lines)
+
+gg <- ggplot(data, aes(x, y, label=text))
+gg <- gg + geom_text(family="mono", hjust=0, size=args$font_size)
+gg <- gg + xlim(c(0, 1))
+gg <- gg + ylim(c(0.5, length(text.lines)+0.5))
+#eliminates background, gridlines, and chart border
+gg <- gg + theme_bw() +
+  theme(plot.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.line = element_blank(),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+
+font.scale <- args$font_size / default.font.size
+width  <- font.scale * max(data$length)   * 0.13 + 0.5
+height <- font.scale * length(text.lines) * 0.18 + 0.6
+ggsave(args$output, gg, width=width, height=height)
+
+
