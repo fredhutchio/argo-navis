@@ -169,7 +169,7 @@ def main(args):
     if args.metadata:
         metadata = list(csv.DictReader(args.metadata))
         # Set the deme getter
-        deme_getter = lambda row: row[args.deme_col] if args.deme_col else default_deme_getter
+        deme_getter = lambda row: row[args.deme_col] if args.deme_col else default_deme_getter(row)
         set_deme(xmldoc, metadata, deme_getter)
         # _could_ do something smart here where we look at which sequences in the XML file traitset that match
         # alignment passed in if _only_ alignment is passed in. Probably not worth it though...
