@@ -50,6 +50,10 @@ fi
 # ======
 
 pact_wrapper.py $PACT_ARGS
+# XXX Stubbing code! Comment out the above, and in the below; or vice versa
+#echo "Would be calling PACT with args: $PACT_ARGS"
+#WORK_DIR=/home/matsengrp/working/csmall/galaxy-central/database/job_working_directory/000/62/working_dir
+
 
 OUT_RULES="$WORK_DIR/out.rules"
 OUT_STATS="$WORK_DIR/out.stats"
@@ -60,18 +64,40 @@ OUT_SKYLINES="$WORK_DIR/out.skylines"
 # PLOTTING RESULTS
 # ================
 
+# Thread access to some shared plotting code
+COMMONR="$ARGO_TOOL_DIR/bin/common.R"
+
+# Need this for csvkit features XXX
+PATH="/home/csmall/pythedge-clstr/bin:$PATH"
+
+# First we're going to create a file with the deme list, for more predicatable coloring:
+FULL_DEME_LIST="full_deme_list"
+csvcut -t -c statistic $OUT_STATS | \
+  csvgrep -c statistic -r "^pro_" | \
+  sed s/pro_// | \
+  sed '1 s/statistic/deme/' > $FULL_DEME_LIST
+
+# Specify colors
+COMMON_ARGS="$COMMONR -d $FULL_DEME_LIST"
+if [[ $COLOR_SELECTOR == "brewer" ]]
+then
+  COMMON_ARGS="$COMMON_ARGS -b $COLOR_BREWER"
+else
+  COMMON_ARGS="$COMMON_ARGS -c $COLOR_FILE"
+fi
+
 # Parse the out.rules file and make a tree plots of it
 TREE_PLOT="tree_plot.svg"
 parse_pact_tree.py $OUT_RULES parsed_pact_tree.csv
-plot_pact_tree.R parsed_pact_tree.csv $TREE_PLOT
+plot_pact_tree.R $COMMON_ARGS parsed_pact_tree.csv $TREE_PLOT
 
 # Make skyline plot
 SKYLINE_PLOT="skyline_plot.svg"
-plot_skyline_hist.R $OUT_SKYLINES $SKYLINE_PLOT
+plot_skyline_hist.R $COMMON_ARGS $OUT_SKYLINES $OUT_STATS $SKYLINE_PLOT
 
 # Do migration rate plot
 MIGRATION_RATES_PLOT="migration_rates_plot.svg"
-plot_migration_rates.R $OUT_STATS $MIGRATION_RATES_PLOT
+plot_migration_rates.R $COMMON_ARGS $OUT_STATS $MIGRATION_RATES_PLOT
 
 # Other stats extraction
 MISC_STATS="misc_stats.svg"
@@ -87,8 +113,8 @@ MAIN="main.svg"
 COMBINED_SVG="combined.svg"
 svg_stack.py --direction="v" $MIGRATION_RATES_PLOT $MISC_STATS > $STATS
 svg_stack.py --direction="h" $TREE_PLOT $SKYLINE_PLOT $STATS > $MAIN
-svg_stack.py --direction="v" $TITLE $MAIN | \
-  inkscape --without-gui --export-pdf=$FIGURES /dev/stdin
+svg_stack.py --direction="v" $TITLE $MAIN > $COMBINED_SVG
+inkscape --without-gui --export-pdf=$FIGURES $COMBINED_SVG
 
 
 # sketch:

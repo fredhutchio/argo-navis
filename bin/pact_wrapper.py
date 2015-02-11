@@ -103,6 +103,8 @@ def get_args():
         help="How far back to compute skyline statistics (don't include -)")
     parser.add_argument('-e', '--trim-end',
         help="Trim the tree from 0 back to the specified time; overrides sky-end (don't include -)")
+    parser.add_argument('-S', '--trim-start',
+        help="Trim the tree from 0 back to the specified time; overrides sky-end (don't include -)")
     parser.add_argument('-o', '--out-dir')
     parser.add_argument('-p', '--prune-to-trunk', action="store_true", default=False)
     return parser.parse_args()

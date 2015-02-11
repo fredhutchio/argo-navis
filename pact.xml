@@ -88,7 +88,7 @@
   <outputs>
     <data name="figures" format="pdf" label="PACT figures"/>
     <data name="full_data" format="txt" label="Full data">
-      <discover_datasets pattern="__designation__" ext="txt" directory="raw_data" visible="true"/>
+      <discover_datasets pattern="__designation__" ext="txt" directory="working_dir" visible="true"/>
     </data>
   </outputs>
 
@@ -127,6 +127,9 @@ CUSTOM_PACT_SETTINGS="${custom_pact_settings}"
 #else
 CUSTOM_PACT_SETTINGS=""
 #end if
+
+
+FIGURES="${figures}"
 
     </configfile>
   </configfiles>

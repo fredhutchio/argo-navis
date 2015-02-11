@@ -3,12 +3,18 @@
 library(argparse)
 library(ggplot2)
 library(gtable)
-source('bin/common.R')
 
 parser <- ArgumentParser()
+parser$add_argument('-b', '--brewer', help="Specify a color brewer pallete")
+parser$add_argument('-c', '--color-spec', help="Specify a deme -> color CSV mapping")
+parser$add_argument('-d', '--demes', help="For help with making colors consistent, always know what all the demes are")
+parser$add_argument('common')
 parser$add_argument('stats')
 parser$add_argument('output')
 args <- parser$parse_args()
+
+# Load shared library
+source(args$common)
 
 
 stats <- read.delim(args$stats,
@@ -26,7 +32,7 @@ mig.split <- strsplit(stats$statistic, "_")
 stats$mig_from <- as.character(lapply(mig.split, function(x) x[2]))
 stats$mig_to <- as.character(lapply(mig.split, function(x) x[3]))
 
-deme.factor <- factorify.deme(stats, 'mig_from')
+deme.factor <- factorify.deme(stats, label='mig_from', args=args)
 stats <- deme.factor$data
 deme.colors <- deme.factor$colors
 

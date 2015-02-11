@@ -2,18 +2,23 @@
 
 library(ggplot2)
 library(argparse)
-source('bin/common.R')
 
 parser <- ArgumentParser()
+parser$add_argument('-b', '--brewer', help="Specify a color brewer pallete")
+parser$add_argument('-c', '--color-spec', help="Specify a deme -> color CSV mapping")
+parser$add_argument('-d', '--demes', help="For help with making colors consistent, always know what all the demes are")
+parser$add_argument('common')
 parser$add_argument('input')
 parser$add_argument('output')
 args <- parser$parse_args()
 
+# Load shared library
+source(args$common)
 
 data <- read.csv(args$input, stringsAsFactors=F)
 
 # Factorify the demes and assign colors
-deme.factor <- factorify.deme(data)
+deme.factor <- factorify.deme(data, args=args)
 data <- deme.factor$data
 deme.colors <- deme.factor$colors
 
