@@ -229,45 +229,58 @@ TRIMMED_TREEFILE="${trimmed_treefile}"
 
 .. class:: infomark
 
-What it does
-------------
+About Argo Navis
+----------------
 
-This runs BEAST for an Argo Navis analysis.
-The inline help should clarify what is required for this tool.
-
-
-Output files
-------------
-
-This tool outputs two files representing the posterior of distribution of evolutionary histories and ancestral trait states.
-
-**Argo BEAST logfile**: A standard BEAST logfile of sampled states and parameters, suitable for being run through tracer.
-
-**Argo BEAST treefile**: A nexus file of trees from the posterior, with ancestral states labeled. This is suitable for
-being run through PACT.
-
-Note that if you run BEAST a number of time in ``-resume`` mode (see above), these output files may become large enough
-to significantly slow down Tracer and PACT.
-If this becomes a problem, you can use the Posterior Subset Tool to reduce the size of these files.
-
-Do note that it's important that you check your logfile for good mixing and convergence using a tool like `Tracer`_, or
-your analyses will basically mean nothing.
+Argo Navis helps you perform *Discrete Trait Ancestral* analysis, in a Bayesian context using BEAST.
+In this context, a discrete trait of a population of organisms could be any characteristic for which there area finite number
+of possible values.
+In population genetics, this is frequently useful for modelling how the genetics of a number of populations
+(*demes*, as in "demegraphics") *migrate* between each other.
+It's also useful for considering how viruses move between species, distinct host populations, or even tissues within a host.
 
 
-Fine tuning
+About this tool
+---------------
+
+This tool is your starting point for running an Argo Navis analysis.
+It runs BEAST for you, and produces output files which you can use in the associated PACT tool for producing data
+visualizations and further analyses of your data.
+It has a number of features which make it easier to investigate aspects of your data, and automate the setup of the BEAST
+files and such.
+
+
+Input files
 -----------
 
-If you'd like to customize more fine tuned settings of the BEAST MCMC (models, priors, etc), you can do so by specifying
-a custom BEAST file template.
-The default template closely follows the setup in the `Ancestral State Reconstruction tutorial`_ by Remco Bouckaert,
-which you can use as a guide for setting up your own custom BEAST analysis.
-You can also download the default template XXX here and make modications from that.
-However you should keep in mind that if you use BEAUti to make your customizations, you'll need to follow some of the
-early steps in Remco's tutorial in order to get BEAST Classic set up with BEAUti.
-Frome there, you can download the default template, and load it by firing up BEAUti and going to "File > Load".
-Also, note that for additional assistance working with and tuning BEAST, the `BEAST homepage`_ is a great resource.
+To run this tool, you'll need some sequence data, and a way to specify which sequences belong to which demes.
+The recommended way of doing this is to specify a FASTA sequence file of sequences, and a separate metadata CSV file with
+additionl information.
+Beyond deme specifications, this metadata file may also specify date information for your sequences.
 
-Some notes to keep in mind if you specify your own BEAST template from scratch:
+An alternative which is still under development XXX, is to have deme and optionally date information encoded into the
+sequence names.
+You will be able to specify regular expressions in order to extract this information.
+
+The last option is specification of this information directly through a BEAST XML config file.
+You can download Beauti [link], install the BEAST Classic module XXX, and then load the template file available here:
+
+XXX
+
+Once you have that loaded into BEAUti, you can replace the sequence data in there with your own.
+Once you've made changes to your config file, you can select "Custom or resume" from "Beast file specification", and specify
+the new BEAST file you've created and uploaded into Galaxy.
+However, you will also have to specify under "Sequence Alignment XXX" and "Metadata specification" that you wish to use the
+data in this file.
+If you don't do this, whatever files/options are specified for Sequence alignment and Metadata specification will replace the
+data specified in your BEAST config file.
+
+Specifying your own BEAST config file is also useful if you wish to customize the model or priors of the analysis.
+Note, the default template closely follows the setup in the `Ancestral State Reconstruction tutorial`_ by Remco Bouckaert,
+which you can use as a guide for setting up your own custom BEAST analysis.
+The `BEAST homepage`_ is also a useful resource if you're looking for help settings things up.
+
+Some notes to keep in mind if you specify your own BEAST config:
 
 * If you choose to specify the deme/community information directly in the your BEAST file and not apply the CSV or regular
   expression data to set this, you must name your discrete trait `deme`, even if it's not deme, but something else, like
@@ -276,11 +289,126 @@ Some notes to keep in mind if you specify your own BEAST template from scratch:
   here in this tool, and can not be assumed to remain as specified in your beastfile.
 * If you don't have tip dates, you can speed up your run by specifying a custom beast file where your fixed clock's rate isn't
   estimated but left constant. If you don't have any temporal data, these estimates won't mean anything anyway.
-* Main logfile must output to ``posterior.log`` and the trait trees to ``posterior.trait.trees``.
+* Main logfile must output to ``posterior.log`` and the trait trees to ``posterior.trait.trees`` [XXX].
+
+
+Output files
+------------
+
+The following two outputs of an initial run are your two most valuable:
+
+**BEAST logfile**: A standard BEAST logfile of sampled states and parameters, suitable use with Tracer.
+
+**BEAST treefile**: A nexus file of trees from the posterior, with ancestral states labeled, suitable for
+being run through PACT.
+
+Once you've carried out a run, you must analyze the logfile to check for convergence.
+For the moment, you will have to do this using Tracer (we're hoping to provide some statistics in tool soon, though XXX),
+by downloading the treefile to your computer and loading it into Tracer.
+You should see some values on the left hand of the screen in the table under the ESS (Effective Sample Size) column.
+A good rule of thumb is that if any of these values are under 200, you should probably run BEAST for longer.
+
+
+Resume runs
+-----------
+
+When you realize that you've spent a bunch of time running BEAST, only to find out that it hasn't run long enough,
+you can pick up right where you left off using this tools Resume functionality.
+You should note that in addition to the logfile and treefile from your last run, you should also have the following:
+
+**BEAST config file**: A copy of the BEAST file created for the run.
+This has been modified to include sequence, deme, and date information, as well as various other run settings.
+
+**BEAST state file**: This is a file that BEAST maintains as it runs so if you wish to restart the process, you won't
+be doing so from scratch.
+
+In order to start a Resume run, start by entering the number of new samples you'd like to add to the data you've already collected.
+Next, in the "BEAST file specification" input, select "Custom or Resume".
+This will open up a file input from which you can select the BEAST config file form the previous run.
+Next, select "Yes" in the "Resume from a previous run?" form input.
+This will open up several new input fields.
+Here you can specify the BEAST logfile, treefile and statefile from your previous run.
+
+You can also specify a total number of samples you want to keep.
+When running a Resume run, your log and tree files can grow large enough to bog down analysis tools.
+This tool returns versions of the log and tree files which have been evenly trimmed down to the specified number of samples
+to keep things manageable.
+It's important to note, however, that if you do further Resume runs, you must make sure to specify the **untrimmed** log and
+tree files for the following runs, or bad things will happen (someone will kill a puppy; seriously).
+It's also important to note that Resume runs ignore all inputs I haven't explicitly mentioned here.
+In particular, you can't change the sequences, the date information, deme specifications or sampling interval.
+If you **do** want to change any of this, you will have to start a new run.
+
+
+Downsampling
+------------
+
+Differences in sampling between demes you study can be a challenge when doing these analyses.
+How do you know that one deme having been sampled more deeply isn't artificially biasing the results towards increased
+diversity?
+It's also frequently the case that researchers studying viruses don't submit every viral sequence they obtain, but go
+through some procedure for deciding which "look the same enough" to consider a single species, from which only one is
+submitted?
+How do you know this wouldn't artificially biases your results towards increased diversity for this deme, since at the
+same number of sequences, there would be an increased diversity coverage the ones with more coverage?
+
+Issues of sampling depth and sampling bias frequently come up in the review process.
+One way to deal with these issues is to show evidence that the sampling issues aren't significantly affecting the results,
+or at the very least, to explore the effects of different sampling strategies on the results.
+Argo Navis provides downsampling tools which help you towards this end.
+
+There are two downsampling methods you can use: Random and K-means.
+Random downsampling is meant to deal with issues of only sampling depth, while K-means downsampling is meant to
+address issues of sampling bias.
+While Radnom downsamling is likely fairly straight-forward, K-means downsampling may not be.
+
+K-means downsampling starts by clustering sequences together into K clusters.
+From each of these clusters a single sequence is chosen to represent the entire cluster.
+This is done for each deme.
+This method introduces intentional, but controlled sampling bias, as for any given number of K samples per
+deme, the sequences chosen are going to reflect the *most* diversity possible among those seqeuences.
+While this doesn't *solve* the problem of sampling bias, it does attempt to put all demes on equal footing, by
+introducing similar diversity bias in all sequences.
+
+A decent strategy for protecting yourself from reviewers is to use *both* of these methods at various K values,
+and compare the results.
+Assuming the results look similar in all cases, then great!
+It would appear you have a very robust set of conclusions.
+If there are differences, there will be a bit more work involved in explaining them, but at least you'll be able to say
+you've thoroughly explored the issue.
+
+On a final note, if you *do* decide to use BEAST's downsampling functionality, you will obtain a couple of additional
+outputs for your convenience:
+
+**Downsampled alignment**: The sequences kept in the the downsampling will be returned.
+This may be useful for tracking which sequences were kept in the analysis, as well as serve as an input to other analyses
+you may wish to perform with the downsampled data.
+
+**Downsampled metadata**: If you supplied metadata for the analysis, you will also get this file.
+Like the Downsampled alignment, it will contain all the metadata for the sequences kept in the downsampling step.
+
+
+Random seeds
+------------
+
+Both the actual BEAST run and the downsampling methods support specification of random seeds.
+Taking advantage of this aids in reproducibility of your analyses, as someone merely has to go in and specify the same seeds
+to reproduce the results exactly.
+If you choose not to specify your own random seeds, random seeds will be chosen for you and printed out in the logs, so that
+if you wish to go back and reproduce something, you should be able to.
+
 
 .. _Tracer: http://tree.bio.ed.ac.uk/software/tracer/
 .. _Ancestral State Reconstruction tutorial: http://beast-classic.googlecode.com/files/ARv2.0.1.pdf
 .. _BEAST homepage: http://beast-classic.googlecode.com/files/ARv2.0.1.pdf
+
+
+Getting things into PACT
+------------------------
+
+Once you're done with this tool, you'll want to take your **trimmed BEAST treefile** and use that as input for your PACT run.
+The PACT tool has it's own documentation, so you'll want to head over there for further instruction.
+Sionara.
 
 
 Citation
