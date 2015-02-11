@@ -46,10 +46,10 @@
       </when>
     </conditional>
 
-    <param name="samples" type="integer" value="10000" label="Number of samples" min="100"
+    <param name="samples" type="integer" value="10000" label="Number of samples"
       help="Number of samples to take."/>
     <!--XXX Will have to check to make sure logging frequency is the same between -resume runs-->
-    <param name="sampling_interval" type="integer" value="1000" label="Sampling interval" min="1"
+    <param name="sampling_interval" type="integer" value="1000" label="Sampling interval"
       help="Number of states explored in chain between samples."/>
     <param name="random_seed" type="integer" value="" label="Random seed" optional="true"
       help="Random seed to be used in BEAST MCMC. Specifying and recording this value can aid in reproducibility."/>
@@ -90,13 +90,13 @@
         <!--Do nothing-->
       </when>
       <when value="random">
-        <param name="k" type="integer" value="" label="N sequences" min="2"
+        <param name="k" type="integer" value="" label="N sequences"
           help="Number of sequences to be taken per deme."/>
         <param name="random_seed" type="integer" value="" label="Random seed" optional="true"
           help="Random seed to be used for sequence selections."/>
       </when>
       <when value="kmeans">
-        <param name="k" type="integer" value="" label="N sequences" min="2"
+        <param name="k" type="integer" value="" label="N sequences"
           help="Number of sequences to be taken per deme."/>
         <param name="random_seed" type="integer" value="" label="Random seed" optional="true"
           help="Random seed to be used for sequence selections."/>
@@ -124,7 +124,7 @@
         <param name="treefile" type="data" format="txt" label="Treefile from last run"
           help="As with the Logfile, cannot be the `trimmed` output."/>
         <param name="statefile" type="data" format="txt" label="State file from previous run."/>
-        <param name="samples" type="integer" value="10000" label="Number of samples to keep" min="2"
+        <param name="samples" type="integer" value="10000" label="Number of samples to keep"
           help="With resume runs, the log and tree files can grow quite large, bogging down PACT and other analysis tools.
           Therefore, after a resume run, 'trimmed' output files are created with this number of samples."/>
       </when>
