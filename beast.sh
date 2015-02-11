@@ -117,16 +117,10 @@ format_beastfile.py $BEASTFILE_TEMPLATE $FORMAT_ARGS $FORMATTED_BEASTFILE
 cp $FORMATTED_BEASTFILE beastfile.xml
 /home/csmall/local/bin/beast $RESUME_FLAG beastfile.xml # The manual path is because matsengrp's beast is v1
 
-# XXX make sure format actually ensures these file locations don't change
 # Copy files over to the locations Galaxy has specified for them
 cp posterior.log $LOGFILE
 cp posterior.trait.trees $TREEFILE
-echo "XXXX"
-readlink -f .
-ls -l . | grep state
 cp beastfile.xml.state $STATEFILE
-#cp posterior.log.state $STATEFILE
-
 
 
 # LOGFILE TRIMMING FOR RESUME RUNS
@@ -134,10 +128,7 @@ cp beastfile.xml.state $STATEFILE
 
 if [ $RESUME_SELECTOR == "true" ]
 then
-  # XXX Haven't hooked these outputs up yet
   posterior_subset.clj -t logfile -c $RESUME_SAMPLES $LOGFILE $TRIMMED_LOGFILE
   posterior_subset.clj -t treefile -c $RESUME_SAMPLES $TREEFILE $TRIMMED_TREEFILE
-  echo "Still in stub mode"
 fi
-
 
