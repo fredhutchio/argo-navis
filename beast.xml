@@ -173,7 +173,11 @@ DATE_REGEX="${metadata.date_regex}"
 
 SAMPLES_FLAG="-s ${samples}"
 SAMPLING_INTERVAL_FLAG="-i ${sampling_interval}"
-RANDOM_SEED="${random_seed}"
+#if str($random_seed) != "None"
+RANDOM_SEED_FLAG="-seed ${random_seed}"
+#else
+RANDOM_SEED_FLAG=""
+#end if
 
 BEASTFILE_SPECIFICATION="${beastfile.specification}"
 #if $beastfile.specification == "custom"

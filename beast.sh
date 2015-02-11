@@ -39,8 +39,16 @@ then
     echo "Must specify deme and alignment data in order to downsample" > /dev/stdout
     exit 1
   fi
+  if [[ $DOWNSAMPLING_RANDOM_SEED == "" ]]
+  then
+    DOWNSAMPLING_RANDOM_SEED=$RANDOM
+    echo "You did not specify a random seed for this run, so this one is being used, in case you'd like to
+      reproduce your results: $DOWNSAMPLING_RANDOM_SEED"
+  else
+    DS_RANDOM_SEED_FLAG="-s $DOWNSAMPLING_RANDOM_SEED"
+  fi
   # This script does the downsampling
-  deme_downsample.py -m $DOWNSAMPLING_METHOD -k $DOWNSAMPLING_K -c $DEME_COLUMN \
+  deme_downsample.py $DS_RANDOM_SEED_FLAG -m $DOWNSAMPLING_METHOD -k $DOWNSAMPLING_K -c $DEME_COLUMN \
     $ALIGNMENT $METADATA_FILE \
     $DOWNSAMPLED_ALIGNMENT downsampled_metadata.csv
   # Assign these to the unsampled variable names so the code below follows the same flow regardless
@@ -115,7 +123,8 @@ format_beastfile.py $BEASTFILE_TEMPLATE $FORMAT_ARGS $FORMATTED_BEASTFILE
 
 # Actually run BEAST and set the output vars to their locations
 cp $FORMATTED_BEASTFILE beastfile.xml
-/home/csmall/local/bin/beast $RESUME_FLAG beastfile.xml # The manual path is because matsengrp's beast is v1
+# The manual path is because matsengrp's beast is v1
+/home/csmall/local/bin/beast $RANDOM_SEED_FLAG $RESUME_FLAG beastfile.xml
 
 # Copy files over to the locations Galaxy has specified for them
 cp posterior.log $LOGFILE
