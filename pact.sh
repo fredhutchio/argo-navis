@@ -117,16 +117,3 @@ svg_stack.py --direction="v" $TITLE $MAIN > $COMBINED_SVG
 inkscape --without-gui --export-pdf=$FIGURES $COMBINED_SVG
 
 
-# sketch:
-# * compute color spec
-# * format pact file
-#   * parse rules
-#     * plot
-#   * plot skylines
-#   * migrate extract
-#     * plot
-#     * table? [out]
-#   * grab all things that have data
-#     * zip [out]
-#   * combine plots [out]
-
