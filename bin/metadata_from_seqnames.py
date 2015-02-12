@@ -31,10 +31,16 @@ def main():
     outwriter.writeheader()
     for seqrec in seqreader:
         seqname = seqrec.id
-        deme = args.deme_regex.match(seqname).groups()[0]
+        try:
+            deme = args.deme_regex.match(seqname).groups()[0]
+        except Exception:
+            raise Exception, "There was a problem parsing deme information for sequence %s. Try again." % seqname
         rowdict = dict(sequence=seqname, deme=deme)
         if args.time_regex:
-            rowdict['date'] = re.time_regex.match(seqname).groups()[0]
+            try:
+                rowdict['date'] = args.time_regex.match(seqname).groups()[0]
+            except Exception:
+                raise Exception, "There was a problem parsing date information for sequence %s. Try again." % seqname
         outwriter.writerow(rowdict)
 
     args.output.close()

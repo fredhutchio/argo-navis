@@ -19,7 +19,7 @@ then
   # If we have a regex, will need to create the specification file to pass along
   if [[ $DATE_REGEX != "" ]]
   then
-    DATE_REGEX_FLAG="-t \"$DATE_REGEX\""
+    DATE_REGEX_FLAG="-t $DATE_REGEX"
     # Need to let things know downstream that there is a date column in the constructed metadata
     DATE_COLUMN="date"
   else
