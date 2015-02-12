@@ -14,8 +14,18 @@
 
     <!-- BASIC DATA SPECIFICATION -->
     <!-- ======================== -->
-    <param name="alignment" type="data" format="fasta" label="Sequence alignment"
-      help="This is optional if you want to use the alignment in the BEAST file."/>
+    <conditional name="alignment">
+      <param name="specification" type="select" label="Alignment specification"
+        help="You can either specify your own alignment data, or use the alignment data in the BEAST config file below.">
+        <option value="file" selected="true">Alignment file</option>
+        <option value="in_beastfile">Use alignment in BEAST config file</option>
+      </param>
+      <when value="file">
+        <param name="alignment" type="data" format="fasta" label="Sequence alignment"
+          help="This is optional if you want to use the alignment in the BEAST file."/>
+      </when>
+      <when value="in_beastfile"/>
+    </conditional>
 
     <conditional name="metadata">
       <param name="specification" type="select" label="Metadata specification"
@@ -23,7 +33,7 @@
         You can either specify a CSV metadata file, or regular expressions for extrating this data from sequence names.">
         <option value="file" selected="true">Metadata file</option>
         <option value="regex">From sequence names</option>
-        <option value="in_beastfile">Use mappings in BEAST XML file</option>
+        <option value="in_beastfile">Use mappings in BEAST config file</option>
       </param>
       <when value="file">
         <param name="file" type="data" format="csv" label="Metadata file"
@@ -176,7 +186,13 @@
     <!-- XXX Not sure if these deme specifications will actually work or not ??? -->
     <configfile name="config">
 
-ALIGNMENT="${alignment}"
+## Specification of alignment
+#if $alignment.specification == "file"
+ALIGNMENT="${alignment.file}"
+#else
+ALIGNMENT=""
+#end if
+
 
 METADATA_SPECIFICATION="${metadata.specification}"
 #if $metadata.specification == "file"

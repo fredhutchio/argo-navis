@@ -80,7 +80,7 @@ else
 fi
 
 # Make a metadata flag we can pass into the format command
-if [[ -n $ALIGNMENT ]]
+if [[ $ALIGNMENT != "" ]]
 then
   # Then use either the file given to us, or the one we constructed from regexprs
   ALIGNMENT_FLAG="-a $ALIGNMENT"
