@@ -71,7 +71,7 @@ fi
 # =================================
 
 # Make a metadata flag we can pass into the format command
-if [[ -n $METADATA_FILE ]]
+if [[ $METADATA_FILE != "" ]]
 then
   # Then use either the file given to us, or the one we constructed from regexprs
   META_FLAG="-m $METADATA_FILE"
@@ -114,7 +114,12 @@ then
 else
   # Otherwise, set the full flag collection
   RESUME_FLAG=""
-  FORMAT_ARGS="$ALIGNMENT_FLAG $META_FLAG $SAMPLES_FLAG $SAMPLING_INTERVAL_FLAG -d $DEME_COLUMN"
+  FORMAT_ARGS="$ALIGNMENT_FLAG $META_FLAG $SAMPLES_FLAG $SAMPLING_INTERVAL_FLAG"
+  # Add deme information only if we know what column it is (which will only be if we have metadata or regexs)
+  if [[ $DATE_COLUMN != "" ]]
+  then
+    FORMAT_ARGS="$FORMAT_ARGS -d $DEME_COLUMN"
+  fi
   # Add the date information only if a date column is specified
   if [[ $DATE_COLUMN != "" ]]
   then
