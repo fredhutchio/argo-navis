@@ -13,10 +13,10 @@ def get_args():
     parser.add_argument('inseqs', help="Input sequences in fasta format")
     parser.add_argument('-d', '--deme-regex', required=True, type=re.compile,
             help="Regular expression with which to parse deme information")
-    parser.add_argument('-t', '--time-regexp', type=re.compile,
+    parser.add_argument('-t', '--time-regex', type=re.compile,
             help="Regular expression with which to parse date information")
     parser.add_argument('output', type=argparse.FileType('w'))
-    return parser
+    return parser.parse_args()
 
 
 def main():
@@ -24,21 +24,20 @@ def main():
     seqreader = SeqIO.parse(args.inseqs, 'fasta')
 
     header = ['sequence', 'deme']
-    if args.time_regexp:
+    if args.time_regex:
         header.append('date')
 
-    outwriter = csv.DictWriter(args.output, header=header)
-    outwriter.write_header()
+    outwriter = csv.DictWriter(args.output, header)
+    outwriter.writeheader()
     for seqrec in seqreader:
         seqname = seqrec.id
-        deme = args.deme_regexp.match(seqname).groups()[0]
+        deme = args.deme_regex.match(seqname).groups()[0]
         rowdict = dict(sequence=seqname, deme=deme)
-        if args.time_regexp:
-            rowdict['date'] = re.time_regexp.match(seqname).groups()[0]
+        if args.time_regex:
+            rowdict['date'] = re.time_regex.match(seqname).groups()[0]
         outwriter.writerow(rowdict)
 
     args.output.close()
-    args.inseqs.close()
 
 
 if __name__ == '__main__':

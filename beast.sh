@@ -15,14 +15,18 @@ then
     echo "Must have alignment in order to specify metadata via regular expression" > /dev/stderr
     exit 1
   fi
+  DEME_COLUMN="deme"
   # If we have a regex, will need to create the specification file to pass along
   if [[ $DATE_REGEX != "" ]]
   then
-    DATE_REGEX_FLAG="-D $DATE_REGEX"
+    DATE_REGEX_FLAG="-t \"$DATE_REGEX\""
     # Need to let things know downstream that there is a date column in the constructed metadata
     DATE_COLUMN="date"
+  else
+    DATE_REGEX_FLAG=""
+    DATE_COLUMN=""
   fi
-  metadata_from_seqnames.py -d "$DEME_REGEX_FLAG" ${DATE_REGEX_FLAG} \
+  metadata_from_seqnames.py -d "$DEME_REGEX" ${DATE_REGEX_FLAG} \
     ${ALIGNMENT} tmp_deme_spec.csv
   METADATA_FILE=tmp_deme_spec.csv
 fi

@@ -35,11 +35,32 @@
       </when>
       <!--XXX - Have to tune these regular expressions-->
       <when value="regex">
-        <param name="deme_regex" type="text" value="[^\s\|]+|(.+)" label="Deme name regular expression"
-          help="Defaults to second value in a 2-ple or triple of '|' separated values."/>
-        <param name="date_regex" type="text" value="[^\s\|]+\|[^\s\|]+\|(.+)" label="Date regular expression" optional="true"
+        <param name="deme_regex" type="text" value="^[^\s\|]+\|([^\|\s]+)" label="Deme name regular expression"
+          help="Defaults to second value in a 2-ple or triple of '|' separated values.
+          For help working with regular expressions, see rubular.com.
+          Use (...) to capture the part of the match you want to extract as the deme name.">
+          <sanitizer>
+            <valid initial="string.printable">
+             <remove value="&apos;"/>
+            </valid>
+            <mapping initial="none">
+              <add source="&apos;" target="__sq__"/>
+            </mapping>
+          </sanitizer>
+        </param>
+        <param name="date_regex" type="text" value="^[^\s\|]+\|(?:[^\|\s]+)\|([\d]+\.?[\d]*)"
+          label="Date regular expression" optional="true"
           help="This regular expression should extract an integer value, which can be interpetted as a time value.
-          Whether it is years, months, days (etc.) is up to you."/>
+          Whether it is years, months, days (etc.) is up to you.">
+          <sanitizer>
+            <valid initial="string.printable">
+             <remove value="&apos;"/>
+            </valid>
+            <mapping initial="none">
+              <add source="&apos;" target="__sq__"/>
+            </mapping>
+          </sanitizer>
+        </param>
       </when>
       <when value="in_beastfile">
         <!--Nothing-->
@@ -167,13 +188,17 @@ DATE_COLUMN="${metadata.date_column}"
 DATE_COLUMN=""
 #end if
 #else
-DEME_REGEX="${metadata.deme_regex}"
-DATE_REGEX="${metadata.date_regex}"
+DEME_REGEX='${metadata.deme_regex}'
+#if str($metadata.date_regex) != 'None'
+DATE_REGEX='${metadata.date_regex}'
+#else
+DATE_REGEX=''
+#end if
 #end if
 
 SAMPLES_FLAG="-s ${samples}"
 SAMPLING_INTERVAL_FLAG="-i ${sampling_interval}"
-#if str($random_seed) != "None"
+#if str($random_seed) not in ["None", ""]
 RANDOM_SEED_FLAG="-seed ${random_seed}"
 #else
 RANDOM_SEED_FLAG=""
