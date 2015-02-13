@@ -23,13 +23,13 @@ summary coal rates          # coalescent rates; separate for each label
 summary mig rates           # migration rates; separate for each label pair
 #summary fst                 # diversity between vs within labels
 
-skyline settings -{sky_end} 0.01 0.01
+skyline settings -{sky_end} -{sky_start} {sky_interval}
 skyline proportions
 """
 
 
-def tips_from_label(meta_reader, label):
-    return [row['sequence'] for row in meta_reader if row['community'] == label]
+def tips_from_label(meta_reader, label, deme_col="deme"):
+    return [row['sequence'] for row in meta_reader if row[deme_col] == label]
 
 
 def translate_tips(tips, translation):
@@ -73,7 +73,7 @@ def prune_tips_string(tips, args):
 def prune_string(args):
     if args.label:
         if args.metadata:
-            tips = tips_from_label(csv.DictReader(args.metadata), args.label)
+            tips = tips_from_label(csv.DictReader(args.metadata), args.label, deme_col=args.deme_col)
             return prune_tips_string(tips, args)
         else:
             return "prune to label " + args.label
@@ -99,14 +99,15 @@ def get_args():
     parser.add_argument('-m', '--metadata', type=argparse.FileType('r'),
         help="""Required for filtering by tips with the beast method""")
     parser.add_argument('-l', '--label')
-    parser.add_argument('-s', '--sky-end', default=2.0,
+    parser.add_argument('-s', '--sky-end', default=2.0, type=float,
         help="How far back to compute skyline statistics (don't include -)")
-    parser.add_argument('-e', '--trim-end',
+    parser.add_argument('-e', '--trim-end', type=float,
         help="Trim the tree from 0 back to the specified time; overrides sky-end (don't include -)")
-    parser.add_argument('-S', '--trim-start',
-        help="Trim the tree from 0 back to the specified time; overrides sky-end (don't include -)")
+    parser.add_argument('-S', '--trim-start', default=0.0, type=float,
+        help="Most recent time to trim to in time interval; will also be used for sky")
     parser.add_argument('-o', '--out-dir')
     parser.add_argument('-p', '--prune-to-trunk', action="store_true", default=False)
+    parser.add_argument('-d', '--deme-col', default="deme", help="Deme column in metadata file")
     return parser.parse_args()
 
 
@@ -121,10 +122,16 @@ def main():
         prune += "\nprune to trunk"
 
     if args.trim_end:
-        prune += "\ntrim ends -%s 0.01" % args.trim_end
+        prune += "\ntrim ends -%s -%s" % (args.trim_end, args.trim_start)
 
-    outfile.write(setting_template.format(prune=prune,
-            sky_end=args.trim_end if args.trim_end else args.sky_end))
+    sky_end = args.trim_end if args.trim_end else args.sky_end
+    sky_start = args.trim_start
+    sky_interval =  abs(args.sky_end - args.sky_end) / 30 # XXX Increase when the time is right
+    outfile.write(setting_template.format(
+            prune=prune,
+            sky_end=sky_end,
+            sky_start=sky_start,
+            sky_interval=sky_interval))
     outfile.close()
 
     # Copy the tree file over to the directory

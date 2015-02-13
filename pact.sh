@@ -3,6 +3,45 @@
 source $(dirname $0)/util.sh
 source $1
 
+# Need this for csvkit features mostly XXX
+PATH="/home/csmall/pythedge-clstr/bin:$PATH"
+
+
+
+# PRELIMINARY RUN OF PACT FOR TMRCA AND DEME MAP
+# ==============================================
+
+PRELIM_DIR=prelim_dir
+mkdir $PRELIM_DIR
+
+
+# First copy things over into our preliminary working dir
+cp $ARGO_TOOL_DIR/prelim_pact_params $PRELIM_DIR/in.param
+cp $TREEFILE $PRELIM_DIR/in.trees
+
+# Go in and run; get out
+cd $PRELIM_DIR
+pact
+cd ..
+
+# Get id -> seqname translation from nexus treefile translations
+ID_TRANSLATION=id_translation.csv
+extract_nexus_translations.py $TREEFILE $ID_TRANSLATION
+
+# Translate the tree rules so we have some metadata to work with
+PRELIM_PARSED_PACT_TREE="prelim_parsed_pact_tree.csv"
+ls $PRELIM_DIR
+parse_pact_tree.py $PRELIM_DIR/out.rules $PRELIM_PARSED_PACT_TREE
+
+# Join preliminary parsed pact tree data and id translation so we get metadata mapping seqname to deme
+METADATA="metadata.csv"
+csvjoin -c id,name $ID_TRANSLATION $PRELIM_PARSED_PACT_TREE | \
+  csvcut -c id,sequence,label - | \
+  sed '1 s/label/deme/' > $METADATA
+
+# Extract average time to MRCA from the out.stats
+TMRCA=`csvgrep -t -c statistic -m tmrca $PRELIM_DIR/out.stats | csvcut -c mean | grep -v mean`
+
 
 
 # INITIALIZE THINGS
@@ -11,7 +50,7 @@ source $1
 WORK_DIR=working_dir
 mkdir $WORK_DIR
 
-PACT_ARGS="$TREEFILE -r -o $WORK_DIR"
+PACT_ARGS="$TREEFILE -d deme -r -o $WORK_DIR"
 
 
 
@@ -21,8 +60,6 @@ PACT_ARGS="$TREEFILE -r -o $WORK_DIR"
 if [[ $TIP_SELECTION_METHOD == "deme" ]]
 then
   # XXX We need meadata or regexp for this one; not sure if there's a way around it
-  echo "XXX Still in stub"
-  $METADATA="stubb"
   PACT_ARGS="$PACT_ARGS -l $DEME -m $METADATA"
 elif [[ $TIP_SELECTION_METHOD == "names" ]]
 then
@@ -36,13 +73,17 @@ fi
 # TIME RANGE SELECTION
 # ====================
 
-if [[ $TIME_RANGE_SELECTOR == "mrca" ]]
+if [[ $TIME_RANGE_SELECTOR != "custom" ]]
 then
-  echo "XXX Still have to handle"
-elif [[ $TIME_RANGE_SELECTOR == "custom" ]]
-then
+  PACT_ARGS="$PACT_ARGS -s $TMRCA"
+  # Add custom logic for doing two prelim pact runs to get the tmrca for just focus tips
+else
   # Still have to write the --strim-start for this into the wrapper
-  PACT_ARGS="$PACT_ARGS -e $TIME_RANGE_END -S $TIME_RANGE_START"
+  PACT_ARGS="$PACT_ARGS -e $TIME_RANGE_END"
+  if [[ $TIME_RANGE_START != "" ]]
+  then
+    PACT_ARGS="$PACT_ARGS -S $TIME_RANGE_START"
+  fi
 fi
 
 
@@ -66,9 +107,6 @@ OUT_SKYLINES="$WORK_DIR/out.skylines"
 
 # Thread access to some shared plotting code
 COMMONR="$ARGO_TOOL_DIR/bin/common.R"
-
-# Need this for csvkit features XXX
-PATH="/home/csmall/pythedge-clstr/bin:$PATH"
 
 # First we're going to create a file with the deme list, for more predicatable coloring:
 FULL_DEME_LIST="full_deme_list"
