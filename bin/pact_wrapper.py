@@ -67,16 +67,19 @@ def prune_tips_string(tips, args):
     if args.translate_trees:
         trans = translation_from_nexus(file(args.trees_in))
         tips = translate_tips(tips, trans)
-    return "prune to tips" + " ".join(tips)
+    return "prune to tips " + " ".join(tips)
 
 
 def prune_string(args):
-    if args.label:
+    if args.labels:
         if args.metadata:
-            tips = tips_from_label(csv.DictReader(args.metadata), args.label, deme_col=args.deme_col)
+            labels = args.labels.split()
+            def _t_for_l(l):
+                return tips_from_label(csv.DictReader(args.metadata), l, deme_col=args.deme_col)
+            tips = [t for l in labels for t in _t_for_l(l)]
             return prune_tips_string(tips, args)
         else:
-            return "prune to label " + args.label
+            return "prune to label " + args.labels
 
     elif args.tip_file or args.tips:
         if args.tip_file:
@@ -97,8 +100,8 @@ def get_args():
         help="""If flagged, the trees_in file will be used for translating tip names from indices to actual
         tip names; this is necessary for BEAST runs only""")
     parser.add_argument('-m', '--metadata', type=argparse.FileType('r'),
-        help="""Required for filtering by tips with the beast method""")
-    parser.add_argument('-l', '--label')
+        help="""Required for filtering by deme/label with the beast method""")
+    parser.add_argument('-l', '--labels')
     parser.add_argument('-s', '--sky-end', default=2.0, type=float,
         help="How far back to compute skyline statistics (don't include -)")
     parser.add_argument('-e', '--trim-end', type=float,
@@ -126,7 +129,7 @@ def main():
 
     sky_end = args.trim_end if args.trim_end else args.sky_end
     sky_start = args.trim_start
-    sky_interval =  abs(args.sky_end - args.sky_end) / 30 # XXX Increase when the time is right
+    sky_interval =  abs(sky_end - sky_start) / 30 # XXX Increase when the time is right
     outfile.write(setting_template.format(
             prune=prune,
             sky_end=sky_end,

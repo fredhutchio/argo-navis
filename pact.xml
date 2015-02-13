@@ -25,12 +25,13 @@
         help="You may optionally choose to restrict these PACT analyses to a subset of the sequences.
         By default, all tips are included in the analysis.">
         <option value="all" selected="true">All tips (no subsetting)</option>
-        <option value="deme">Select By Deme</option>
+        <option value="demes">Select By Deme</option>
         <option value="names">Space separated tip names</option>
         <option value="file">Tip name file</option>
       </param>
-      <when value="deme">
-        <param name="deme" type="text" value="" label="Deme" help="Restrict analyses to the specified deme."/>
+      <when value="demes">
+        <param name="demes" type="text" value="" label="Demes"
+          help="Restrict analyses to the specified deme (space seprated if specifying multiple)."/>
       </when>
       <when value="names">
         <param name="tip_name" type="text" value="" label="Tip names"
@@ -100,8 +101,8 @@ TREEFILE="${treefile}"
 FIGURES_TITLE="${figures_title}"
 
 TIP_SELECTION_METHOD="${tip_selection.method}"
-#if $tip_selection.method == "deme"
-DEME="${tip_selection.deme}"
+#if $tip_selection.method == "demes"
+DEMES="${tip_selection.demes}"
 #else if $tip_selection.method == "names"
 TIP_NAMES="${tip_selection.names}"
 #else if $tip_selection.method == "file"

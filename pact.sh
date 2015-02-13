@@ -57,10 +57,9 @@ PACT_ARGS="$TREEFILE -d deme -r -o $WORK_DIR"
 # SET UP TIP SELECTION
 # ====================
 
-if [[ $TIP_SELECTION_METHOD == "deme" ]]
+if [[ $TIP_SELECTION_METHOD == "demes" ]]
 then
-  # XXX We need meadata or regexp for this one; not sure if there's a way around it
-  PACT_ARGS="$PACT_ARGS -l $DEME -m $METADATA"
+  PACT_ARGS="$PACT_ARGS -l "$DEMES" -m $METADATA"
 elif [[ $TIP_SELECTION_METHOD == "names" ]]
 then
   PACT_ARGS="$PACT_ARGS -t $TIP_NAMES"
@@ -127,7 +126,9 @@ fi
 # Parse the out.rules file and make a tree plots of it
 TREE_PLOT="tree_plot.svg"
 parse_pact_tree.py $OUT_RULES parsed_pact_tree.csv
-plot_pact_tree.R $COMMON_ARGS parsed_pact_tree.csv $TREE_PLOT
+csvjoin --left -c name,id parsed_pact_tree.csv $ID_TRANSLATION > parsed_pact_tree.renamed.csv
+
+plot_pact_tree.R $COMMON_ARGS parsed_pact_tree.renamed.csv $TREE_PLOT
 
 # Make skyline plot
 SKYLINE_PLOT="skyline_plot.svg"
