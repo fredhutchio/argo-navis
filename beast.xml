@@ -276,16 +276,6 @@ TRIMMED_TREEFILE="${trimmed_treefile}"
 
 .. class:: infomark
 
-About Argo Navis
-----------------
-
-Argo Navis helps you perform *Discrete Trait Ancestral* analysis, in a Bayesian context using BEAST.
-In this context, a discrete trait of a population of organisms could be any characteristic for which there area finite number
-of possible values.
-In population genetics, this is frequently useful for modelling how the genetics of a number of populations
-(*demes*, as in "demegraphics") *migrate* between each other.
-It's also useful for considering how viruses move between species, distinct host populations, or even tissues within a host.
-
 
 About this tool
 ---------------
@@ -329,14 +319,14 @@ The `BEAST homepage`_ is also a useful resource if you're looking for help setti
 
 Some notes to keep in mind if you specify your own BEAST config:
 
-* If you choose to specify the deme/community information directly in the your BEAST file and not apply the CSV or regular
-  expression data to set this, you must name your discrete trait `deme`, even if it's not deme, but something else, like
-  species name or tissue type.
-* Note that the chain length and sampling interval settings in your beastfile will get overriden by whatever is specified
-  here in this tool, and can not be assumed to remain as specified in your beastfile.
-* If you don't have tip dates, you can speed up your run by specifying a custom beast file where your fixed clock's rate isn't
-  estimated but left constant. If you don't have any temporal data, these estimates won't mean anything anyway.
-* Main logfile must output to ``posterior.log`` and the trait trees to ``posterior.trait.trees`` [XXX].
+1. If you choose to specify the deme/community information directly in the your BEAST file and not apply the CSV or regular
+   expression data to set this, you must name your discrete trait `deme`, even if it's not deme, but something else, like
+   species name or tissue type.
+2. Note that the chain length and sampling interval settings in your beastfile will get overriden by whatever is specified
+   here in this tool, and can not be assumed to remain as specified in your beastfile.
+3. If you don't have tip dates, you can speed up your run by specifying a custom beast file where your fixed clock's rate isn't
+   estimated but left constant. If you don't have any temporal data, these estimates won't mean anything anyway.
+4. Main logfile must output to ``posterior.log`` and the trait trees to ``posterior.trait.trees`` [XXX].
 
 
 Output files

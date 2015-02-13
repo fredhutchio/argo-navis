@@ -145,41 +145,86 @@ What it does
 ------------
 
 This runs PACT for an Argo Navis analysis.
-PACT (Posterior Analysis of Coalescent Trees), as the name suggests, is a tool for analyzing the tree file output of an Argo
-Navis BEAST run.
-It is an impressive tool, with many powerful analytic features, but we'll only focus on a core subset in this wrapper of the tool.
+PACT (Posterior Analysis of Coalescent Trees) is a tool for analyzing the tree file output of an Argo Navis BEAST run.
+While PACT is very powerful and flexible, it can be challenging to get started.
+The Argo Navis wrapper automates a core set of PACT features, making it easy to operate for beginners.
 
-The key features of PACT that make it so powerful are its vast range of statistics and metrics which can be computed, coupled with
-it's ability to restrict these metrics to a subset of the tree ancestry, both in time and in tree tips.
-These features make it possible to ask very pointed questions out of a complicated data set.
-For instance, imagine you have virus sequences from a number of host species;
-You might want to find out what the ancestry looks like of the viruses in species A.
-In particular, you might want to know what population(s) the virus in species A was in just before ending there.
-With PACT, you can simply subset to the viruses in species A to invetigate this, and look at any number of statistics for them.
 
-While PACT has many different analyses and statistics you can perform, here we focus on a select few.
-We look at:
+How PACT works
+--------------
 
-* **Skyline proportions**: These look at the ancestral proportions associated with each deme as we look back towards the root.
-* **Migrate rates**: These are estimates with bounds of the rate of migration between each pair of demes.
-* **Maximum likelyhood reconstruction**: The most likley tree and acestral demestate history in the posterior.
-* **Other miscelaneous stats**: TMCA, etc.
+PACTS power and flexibility is due largely to it's combination of
 
-We also let you restrict the tree to any tip set or temporal range you like.
+1. A wide range of statistics
+2. Ability to subset the posterior trees, to focus on statistics related to specific questions
+3. The above features compose
 
-If you would like to run other analyses, you can take a look at the `PACT documentation`_.
-While this tool doesn't support plotting functionality for more advanced analyses, you can place your own PACT file in this tool,
-get the results in the output zip file and do what you like with them.
+This means you can ask very ponited question about particular aspects of your evolutionary histories.
+For example, if a virus has infected a several populations, you might be interested in where the viruses infecting one of them came from.
+To determine this, you could hone in on the parts of the tree leading to the population of interest, and perhaps even restrict to time
+window around when transmission into that group occured.
+Within the context of this restriction, you could look at the proportions of tree length associated with each population, across all of
+the trees in the posterior sample [XXX add reference to simple posterior explanation?].
+Additionally, you could analyze within this restrictions the number of transmissions into the population of interest from each of the
+other populations, and even estimate the rate of such transmissions.
 
-Output files
-------------
 
-This tool outputs two files:
+What Argo Navis' PACT wrapper produces
+--------------------------------------
 
-* **PACT figures**: A collection of figures representing the results for these analyses.
-* **All files**: A collection of any other files output by PACT.
+Again, while PACT is a very powerful and versitile tool, for the sake of making it easier to use, we focus on a limited set of functionality.
+Specifically, we produce a single PDF document with several plots and figures, and a table of statistics, as well as all of the raw data files
+produced by PACT in case you'd like to do something more custom with them.
+
+The following figures are produced in the output PDF file:
+
+1. **Maximumum likelihood ancestral state tree**: This is the tree from the posterior trees with the highest likelihood.
+   It is colored by deme, and shows one possible history of how the discrete trait may have evolved along with the molecular sequences.
+   Do keep in mind though, this is only the *most likely* evolutionary course of the molecules and demes under study.
+   It's possible the rest of the posterior sample looks quite different, and this should be taken into account when analyzing results.
+   This tree is provided as a way of building some intuition about the data, and providing threads you can explore more formally with other tools.
+2. **Skyline proportions**: In the section above about *How PACT works*, we described how you could look at the population proportions for a
+   particular portion of the tree are distributed.
+   We can take this one step further by using the ``skyline`` functionality of PACT, which enables us to compute a statistic for many different
+   small time windows at once.
+   By combining these windows, we get a picture of how the proportions are shifting over time.
+3. **Migration rates**: As mentioned above, migration rates can be estimated based on the posterior trees.
+   This is graphically represented via a table of boxplots, representing the mean and 95% confidence intervals of the migration rates to and
+   from each population.
+   The rows of this table correpsond to migration "origin", and the columns correpond to "destination".
+   Additionally, the boxes are colored by migration origin, with the same scheme as used for other plots.
+4. **Additional statistics**: Additional statistics are presented in textual table format.
+
+
+Argo Navis PACT controls
+------------------------
+
+All you need in order to run the PACT tool is the treefile output from your BEAST run.
+Note that if you have done a *resume* run, you should use the **trimmed** version of the treefile, so PACT doesn't get too bogged down
+with a large data set.
+In addition to the data though, you can specify:
+
+1. **Figure title**: A title to display at the top of your PDF document, for help in organizing.
+2. **Tip selection**: Restrict analyses to a particular set of tree tips.
+   You're choices here include:
+   a. leaving all tree tips in the analysis
+   b. subsetting to just the tree tips corresponding to a specific deme
+   c. subsetting to an arbitrary collection of tree tips via text field
+   d. subsetting to an arbitrary collection of tree tips, as specified by an input file
+3. **Temporal select**: Restrict analyses to a particular time window.
+   You can specify either or both of start time and stop time.
+   By default, analyses consider the entire history of the posterior trees, and the skyline proportions go as far back as the mean TMRCA.
+4. **Color specification**: You can customize the color scheme used in the graphics, either using a `ColorBrewer`_ pallete, or a CSV file
+   mapping demes to RGB color specifications
+
+If you would like to run more customized analyses, you can also specify a custom PACT config file.
+However, this tool does not support the PDF output for more customized analyses;
+You will instead get individual textual output files, which you will have to process/interpret as you see fit.
+For guidance in this, we recommend you take a look at the `PACT documentation`_.
+
 
 .. _PACT documentation: https://github.com/trvrb/PACT/blob/master/pact_manual.pdf?raw=true
+.. _ColorBrewer: http://colorbrewer2.org
 
 
 Citation

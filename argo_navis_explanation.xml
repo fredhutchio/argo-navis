@@ -2,49 +2,58 @@
   <description>A quick introduction</description>
   <help>
 
-==========
+
 Argo Navis
-==========
-
-Discrete Trait Ancestral State Reconstruction with BEAST (al. a Migrate)
-------------------------------------------------------------------------
-
-**Argo Navis** is a *set* of tools designed for carrying out Discrete Trait Ancestral State Reconstructions.
-A discrete trait is really just some trait which takes on some finite number of values;
-In our case, we're specifically interested in traits which apply towards organisms we wish to study phylogenetically.
-This could be applied towards (discrete) phylogeography, or the study of cross species migration or tropism/compartmentalization of viruses.
-
-The core of Argo Navis is a BEAST analysis which produces the posterior of a phylogenetic distribution which includes labeling of the phylogenetic trees in the posterior with the discrete states.
-Internally, BEAST is modelling not just the phylogenetic probabilities, but the probabilities of transitions between the various discrete traits given the data.
-From this data, we're able to look at and compare these various migration rates and begin to ask questions about the history of these discrete traits throughout the evolutionary history under investigation.
-
-* Discrete Trait Ancestral State Reconstruction
-* Model evolutionary histories where we have a discrete trait that evolves along with the sequences
-* These discrete traits can model geographic location, host group, or host tissue type.
-* Looks at both the rates of transition between states, as well as the states at various points in our trees
-
-* Pact let's us ask more pointed questions about these trees
-* We can analyze the distribution of trait assignments and transition rates between traits restricting to temporal regions and subsets of the tree tips
-* See flu and astv
-
-* This tool is composed of several components
-* subsetting: exlained therein; acts as a preprocessor to the BEAST runs, useful for investigating sampling issues (bias/depth)
-* beast: performance the actual phylogenetic analyses, returning posterior files used in later steps
-* (implicit): tracer for analyzing convergence
-* posterior downsampling: If multiple runs of beast are required to obtain good mixing, they can bog down tracer and pact; this tool will prune these to a reasonable length
-* pact: run pact on a specified time range and set of tips and return some statistical analyses as well as figures summarizing the evolutionary/trait history over this period
-
-Your data
-
-* Fasta file of seqs
-* Deme data: either
-  * specificed in a separate metadata CSV file
-  * inlcuded in sequence names, decodable by regular expression
-* Date data (optional): specified just like Deme data; not specifying sets a strict clock and all tips to the same date.
-* Color spec (optional): For pact output figures, provides a consistent color scheme; either CSV of hex values or colorbrewer
+----------
 
 
-; Should cite the upcoming AstV paper...
+**Argo Navis** is a *set* of tools designed for carrying out *Ancestral Discrete Trait* analyses, for phylogeographics or molecular epidemiology.
+It does this in a Bayesian setting, using BEAST to produce posteriors, and PACT as an analysis tool to extract information from these posteriors.
+
+
+About discrete traits
+---------------------
+
+In general, a *discrete trait* is one which takes on some finite number of values.
+In a phylogenetic setting, a discrete trait can represent geographical location, host species of a virus, or tissue compartment of a host.
+We can model evolutionary histories in such a way that transitions in this discrete trait are accounted for.
+This transitions might represent physical migration of organisms, or transmission of a virus from one host group to another.
+Within this model we can think about the rate of transitions from one trait to another as the rate of migration from one location to another,
+or the rate of zoonoses from one organism to another.
+
+
+How Argo Navis is set up
+------------------------
+
+Argo Navis uses BEAST to perform it's phylogenetic and discrete trait analyses.
+Setting up a configuration file to run with BEAST, and getting all of the settings just can be duanting for beginners.
+For this reason, Argo Navis' BEAST tool automates as much of this work as possible, requiring you only to specify your sequence and discrete
+trait data.
+It also provides a number of powerful options for dealing with some of the finer points of settings up more custom analyses, all
+of which can be configured through dropdown menus and text fields.
+
+The second component of Argo Navis is PACT (Posterior Analysis of Coalescent Trees), developed by Trevor Bedford.
+PACT takes the labeled trees output file from BEAST, and performs highly customizable and flexible analyses from it.
+However, PACT is perhaps even more daunting to use than BEAST, as it's only configurable through text files which instruct PACT
+as to the analyses it must perform.
+But as with BEAST, Argo Navis wraps many of the features you'd most commonly want to use into a simple Graphical interface.
+
+While Argo Navis can't expose all of the powerful features of both programs, it should help considerably with folks getting started doing
+discrete state ancestral analyses.
+
+For more help with the individual tools, including usage, and how to interpret the outputs, plesae see the documentation for each of
+the two compoonents.
+
+
+Resources
+---------
+
+The following are some studies that have used some or all of these methods for discrete trait ancestral analysis:
+
+* flu study
+* astv study
+* phylogeo examples?
+
 
 Matsen FA IV, Small CT, Soliven K, Engel GA, Feeroz MM, et al. (2014) `A Novel Bayesian Method for Detection of APOBEC3-Mediated Hypermutation and Its Application to Zoonotic Transmission of Simian Foamy Viruses`_. PLoS Comput Biol 10(2): e1003493. doi:10.1371/journal.pcbi.1003493
 
