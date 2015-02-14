@@ -34,8 +34,17 @@
           help="Restrict analyses to the specified deme (space seprated if specifying multiple)."/>
       </when>
       <when value="names">
-        <param name="tip_name" type="text" value="" label="Tip names"
-          help="Restrict analyses to the specified tip names (space separated)."/>
+        <param name="tip_names" type="text" value="" label="Tip names"
+          help="Restrict analyses to the specified tip names (space separated).">
+          <sanitizer>
+            <valid initial="string.printable">
+             <remove value="&apos;"/>
+            </valid>
+            <mapping initial="none">
+              <add source="&apos;" target="__sq__"/>
+            </mapping>
+          </sanitizer>
+        </param>
       </when>
       <when value="file">
         <param name="file" type="data" format="txt" label="Tip names file"
@@ -103,7 +112,7 @@ TIP_SELECTION_METHOD="${tip_selection.method}"
 #if $tip_selection.method == "demes"
 DEMES="${tip_selection.demes}"
 #else if $tip_selection.method == "names"
-TIP_NAMES="${tip_selection.names}"
+TIP_NAMES="${tip_selection.tip_names}"
 #else if $tip_selection.method == "file"
 TIP_FILE="${tip_selection.names}"
 #end if

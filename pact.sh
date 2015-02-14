@@ -65,7 +65,7 @@ then
   PACT_ARGS+=("-l" "\"$DEMES\"" "-m" $METADATA)
 elif [[ $TIP_SELECTION_METHOD == "names" ]]
 then
-  PACT_ARGS+=("-t" $TIP_NAMES)
+  PACT_ARGS+=("-t" "\"$TIP_NAMES\"")
 elif [[ $TIP_SELECTION_METHOD == "file" ]]
 then
   PACT_ARGS+=("-T" $TIP_FILE)

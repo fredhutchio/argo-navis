@@ -14,7 +14,7 @@ setting_template = """
 {prune}
 
 # TREE OUTPUT
-print rule tree             # print out the fucking tree...
+print rule tree             # print out the tree...
 
 # SUMMARY STATS
 summary tmrca               # time to mrca
@@ -87,7 +87,8 @@ def prune_string(args):
         if args.tip_file:
             tips = args.tip_file.read().split()
         else:
-            tips = args.tips.split()
+            tips = args.tips.replace("'", "").replace("\"", "").split()
+        print "Tips specified are:", tips
         return prune_tips_string(tips, args)
     else:
         return ""
