@@ -46,6 +46,7 @@ gg <- gg + scale_y_sqrt()
 gg <- gg + labs(y="")
 gg <- gg + theme_bw()
 gg <- gg + xlab("target host group")
+gg <- gg + labs(title="Migration rate comparison")
 
 
 # Render and save output; with the right hand facet labels on the left instead...

@@ -37,7 +37,8 @@ gg <- gg + theme(axis.text.y=element_blank(),
                  axis.ticks.y=element_blank(),
                  axis.title.y=element_blank(),
                  legend.position="none")
-gg <- gg + xlab("evolutionary distance")
+gg <- gg + xlab("time (units same as tip dates)")
+gg <- gg + labs(title="Maximum likelihood ancestral reconstruction")
 
 # Dynamically compute dimensions
 n <- dim(tips.data)[1]
