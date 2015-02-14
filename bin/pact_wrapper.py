@@ -132,7 +132,7 @@ def main():
 
     sky_start = args.trim_start if args.trim_start else args.sky_start
     sky_end = args.trim_end
-    sky_interval =  abs(sky_end - sky_start) / 30 # XXX Increase when the time is right
+    sky_interval =  abs(sky_end - sky_start) / 100
     outfile.write(setting_template.format(
             prune=prune,
             sky_end=sky_end,
