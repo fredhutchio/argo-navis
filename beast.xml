@@ -166,8 +166,11 @@
   <outputs>
     <data name="logfile" format="tabular" label="BEAST logfile"/>
     <data name="treefile" format="nex" label="BEAST treefile"/>
-    <data name="formatted_beastfile" format="xml" label="BEAST config file"/>
     <data name="statefile" format="text" label="BEAST state file"/>
+
+    <data name="formatted_beastfile" format="xml" label="BEAST config file">
+      <filter>resume['selector'] != "true"</filter>
+    </data>
     <data name="downsampled_alignment" format="fasta" label="Downsampled alignment">
       <filter>downsampling['method'] != "none"</filter>
     </data>
@@ -251,7 +254,11 @@ DOWNSAMPLING_RANDOM_SEED="${downsampling.random_seed}"
 
 LOGFILE="${logfile}"
 TREEFILE="${treefile}"
+#if $resume.selector != "true"
 FORMATTED_BEASTFILE="${formatted_beastfile}"
+#else
+FORMATTED_BEASTFILE="formatted_beastfile.xml"
+#end if
 STATEFILE="${statefile}"
 
 #if $downsampling.method != "none"
