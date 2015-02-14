@@ -76,9 +76,9 @@ def prune_string(args):
     if args.labels:
         if args.metadata:
             labels = args.labels.replace("\"", "").replace("'", "").split()
-            print "Labels are:", labels
+            print "Pruning to labels:", labels
             tips = tips_from_labels(csv.DictReader(args.metadata), labels, deme_col=args.deme_col)
-            print "Tips are:", tips
+            print "Tips for labels are:", tips
             return prune_tips_string(tips, args)
         else:
             return "prune to label " + args.labels
