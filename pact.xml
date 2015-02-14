@@ -57,7 +57,8 @@
         <param name="start" type="float" value="1.0" label="Start time"
           help="The age of the oldest ancestry which should be considered (as a positive number)."/>
         <param name="end" type="float" value="0.0" label="End time" optional="true"
-          help="The age of the most recent ancestry which should be considered (as a non-negative number)."/>
+          help="The age of the most recent ancestry which should be considered (as a non-negative number).
+          Note: this will fail if you specify a time window which excludes all tips in your study."/>
       </when>
     </conditional>
 

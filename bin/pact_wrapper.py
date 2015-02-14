@@ -23,7 +23,7 @@ summary coal rates          # coalescent rates; separate for each label
 summary mig rates           # migration rates; separate for each label pair
 #summary fst                 # diversity between vs within labels
 
-skyline settings -{sky_end} -{sky_start} {sky_interval}
+skyline settings -{sky_start} -{sky_end} {sky_interval}
 skyline proportions
 """
 
@@ -104,12 +104,13 @@ def get_args():
     parser.add_argument('-m', '--metadata', type=argparse.FileType('r'),
         help="""Required for filtering by deme/label with the beast method""")
     parser.add_argument('-l', '--labels')
-    parser.add_argument('-s', '--sky-end', default=2.0, type=float,
-        help="How far back to compute skyline statistics (don't include -)")
-    parser.add_argument('-e', '--trim-end', type=float,
-        help="Trim the tree from 0 back to the specified time; overrides sky-end (don't include -)")
-    parser.add_argument('-S', '--trim-start', default=0.0, type=float,
-        help="Most recent time to trim to in time interval; will also be used for sky")
+    parser.add_argument('-s', '--sky-start', default=2.0, type=float,
+        help="How far back to compute skyline statistics (should be a potive number)")
+    parser.add_argument('-S', '--trim-start', type=float,
+        help="""Trim the tree from 0 back to the specified time; overrides sky-start for skyline plots.
+        (should be a positive number)""")
+    parser.add_argument('-e', '--trim-end', default=0.0, type=float,
+        help="Most recent time to trim to in time interval; will also be used for sky (should be non-negative)")
     parser.add_argument('-o', '--out-dir')
     parser.add_argument('-p', '--prune-to-trunk', action="store_true", default=False)
     parser.add_argument('-d', '--deme-col', default="deme", help="Deme column in metadata file")
@@ -126,11 +127,11 @@ def main():
     if args.prune_to_trunk:
         prune += "\nprune to trunk"
 
-    if args.trim_end:
-        prune += "\ntrim ends -%s -%s" % (args.trim_end, args.trim_start)
+    if args.trim_start:
+        prune += "\ntrim ends -%s -%s" % (args.trim_start, args.trim_end)
 
-    sky_end = args.trim_end if args.trim_end else args.sky_end
-    sky_start = args.trim_start
+    sky_start = args.trim_start if args.trim_start else args.sky_start
+    sky_end = args.trim_end
     sky_interval =  abs(sky_end - sky_start) / 30 # XXX Increase when the time is right
     outfile.write(setting_template.format(
             prune=prune,

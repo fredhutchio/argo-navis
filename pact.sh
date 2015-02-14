@@ -75,17 +75,17 @@ fi
 # TIME RANGE SELECTION
 # ====================
 
-if [[ $TIME_RANGE_SELECTOR != "custom" ]]
+if [[ $TIME_RANGE_SELECTOR == "custom" ]]
 then
+  # Still have to write the --strim-start for this into the wrapper
+  PACT_ARGS+=("-S" $TIME_RANGE_START)
+  if [[ $TIME_RANGE_END != "" ]]
+  then
+    PACT_ARGS+=("-e" $TIME_RANGE_END)
+  fi
+else
   PACT_ARGS+=("-s" $TMRCA)
   # Add custom logic for doing two prelim pact runs to get the tmrca for just focus tips
-else
-  # Still have to write the --strim-start for this into the wrapper
-  PACT_ARGS+=("-e" $TIME_RANGE_END)
-  if [[ $TIME_RANGE_START != "" ]]
-  then
-    PACT_ARGS+=("-S" $TIME_RANGE_START)
-  fi
 fi
 
 
