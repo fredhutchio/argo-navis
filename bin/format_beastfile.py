@@ -122,6 +122,14 @@ def set_mcmc(xmldoc, samples, sampling_interval):
         logger.set('logEvery', str(logevery))
 
 
+def normalize_filenames(xmldoc, logger_filename="posterior.log", treefile_filename="posterior.trait.trees"):
+    run_node = xmldoc.find('run')
+    logfile_node = run_node.find('logger[@id="tracelog"]')
+    treefile_node = run_node.find('logger[@id="treeWithTraitLogger.deme"]')
+    logfile_node.set('fileName', logger_filename)
+    treefile_node.set('fileName', treefile_filename)
+
+
 def set_deme_count(xmldoc, metadata, deme_getter=default_deme_getter):
     "Updates the model specs based onthe number of demes in the data set."
     demes = list(set(map(deme_getter, metadata)))
@@ -189,6 +197,10 @@ def main(args):
     if args.samples or args.sampling_interval:
         interval = args.sampling_interval if args.sampling_interval else get_current_interval(xmldoc)
         set_mcmc(xmldoc, args.samples, interval)
+
+    # Make sure that we always have the same file names out. These are specified as defaults of the function,
+    # but could be customized here or through the cl args if needed.
+    normalize_filenames(xmldoc)
 
     # Write the output
     xmldoc.write(args.beastfile)
