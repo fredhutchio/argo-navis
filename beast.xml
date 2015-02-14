@@ -21,7 +21,7 @@
         <option value="in_beastfile">Use alignment in BEAST config file</option>
       </param>
       <when value="file">
-        <param name="alignment" type="data" format="fasta" label="Sequence alignment"
+        <param name="file" type="data" format="fasta" label="Sequence alignment"
           help="This is optional if you want to use the alignment in the BEAST file."/>
       </when>
       <when value="in_beastfile"/>
