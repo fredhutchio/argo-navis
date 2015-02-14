@@ -166,3 +166,7 @@ svg_stack.py --direction="v" $TITLE $MAIN > $COMBINED_SVG
 inkscape --without-gui --export-pdf=$FIGURES $COMBINED_SVG
 
 
+# Remove things we don't want in the dynamic outputs:
+rm $WORK_DIR/in.trees
+
+
