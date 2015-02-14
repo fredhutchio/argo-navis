@@ -32,7 +32,10 @@ gg <- gg + scale_color_manual(values=deme.colors)
 gg <- gg + geom_text(aes(x=x+0.01, y=y, label=sequence, hjust=0), color="black", size=1.8)
 gg <- gg + geom_point(aes(color=label), data=tips.data)
 gg <- gg + theme_bw()
-gg <- gg + xlim(min(data$x), 0.1)
+# Add some padding for the label names on right
+x.range <- abs(min(data$x) - max(data$x))
+x.end <- max(data$x) + (x.range * 0.1)
+gg <- gg + xlim(min(data$x), x.end)
 gg <- gg + theme(axis.text.y=element_blank(),
                  axis.ticks.y=element_blank(),
                  axis.title.y=element_blank(),
