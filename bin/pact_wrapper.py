@@ -31,6 +31,8 @@ skyline proportions
 def tips_from_label(meta_reader, label, deme_col="deme"):
     return [row['sequence'] for row in meta_reader if row[deme_col] == label]
 
+def tips_from_labels(meta_reader, labels, deme_col="deme"):
+    return [row['sequence'] for row in meta_reader if row[deme_col] in labels]
 
 def translate_tips(tips, translation):
     result = list()
@@ -73,10 +75,10 @@ def prune_tips_string(tips, args):
 def prune_string(args):
     if args.labels:
         if args.metadata:
-            labels = args.labels.split()
-            def _t_for_l(l):
-                return tips_from_label(csv.DictReader(args.metadata), l, deme_col=args.deme_col)
-            tips = [t for l in labels for t in _t_for_l(l)]
+            labels = args.labels.replace("\"", "").replace("'", "").split()
+            print "Labels are:", labels
+            tips = tips_from_labels(csv.DictReader(args.metadata), labels, deme_col=args.deme_col)
+            print "Tips are:", tips
             return prune_tips_string(tips, args)
         else:
             return "prune to label " + args.labels

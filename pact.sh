@@ -50,7 +50,10 @@ TMRCA=`csvgrep -t -c statistic -m tmrca $PRELIM_DIR/out.stats | csvcut -c mean |
 WORK_DIR=working_dir
 mkdir $WORK_DIR
 
-PACT_ARGS="$TREEFILE -d deme -r -o $WORK_DIR"
+# We're using arrays here to solve this problem:
+# http://stackoverflow.com/questions/12136948/in-bash-why-do-shell-commands-ignore-quotes-in-arguments-when-the-arguments-are
+# Can't really seem to get multiple deme or tip names in otherwise
+PACT_ARGS=($TREEFILE "-d" "deme" "-r" "-o" $WORK_DIR)
 
 
 
@@ -59,13 +62,13 @@ PACT_ARGS="$TREEFILE -d deme -r -o $WORK_DIR"
 
 if [[ $TIP_SELECTION_METHOD == "demes" ]]
 then
-  PACT_ARGS="$PACT_ARGS -l "$DEMES" -m $METADATA"
+  PACT_ARGS+=("-l" "\"$DEMES\"" "-m" $METADATA)
 elif [[ $TIP_SELECTION_METHOD == "names" ]]
 then
-  PACT_ARGS="$PACT_ARGS -t $TIP_NAMES"
+  PACT_ARGS+=("-t" $TIP_NAMES)
 elif [[ $TIP_SELECTION_METHOD == "file" ]]
 then
-  PACT_ARGS="$PACT_ARGS -T $TIP_FILE"
+  PACT_ARGS+=("-T" $TIP_FILE)
 fi
 
 
@@ -74,14 +77,14 @@ fi
 
 if [[ $TIME_RANGE_SELECTOR != "custom" ]]
 then
-  PACT_ARGS="$PACT_ARGS -s $TMRCA"
+  PACT_ARGS+=("-s" $TMRCA)
   # Add custom logic for doing two prelim pact runs to get the tmrca for just focus tips
 else
   # Still have to write the --strim-start for this into the wrapper
-  PACT_ARGS="$PACT_ARGS -e $TIME_RANGE_END"
+  PACT_ARGS+=("-e" $TIME_RANGE_END)
   if [[ $TIME_RANGE_START != "" ]]
   then
-    PACT_ARGS="$PACT_ARGS -S $TIME_RANGE_START"
+    PACT_ARGS+=("-S" $TIME_RANGE_START)
   fi
 fi
 
@@ -89,7 +92,8 @@ fi
 # RUN IT
 # ======
 
-pact_wrapper.py $PACT_ARGS
+# Again, as mentioned above, have to do this array thing to get arg list construction to work properly
+pact_wrapper.py "${PACT_ARGS[@]}"
 # XXX Stubbing code! Comment out the above, and in the below; or vice versa
 #echo "Would be calling PACT with args: $PACT_ARGS"
 #WORK_DIR=/home/matsengrp/working/csmall/galaxy-central/database/job_working_directory/000/62/working_dir
