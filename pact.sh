@@ -118,6 +118,12 @@ csvcut -t -c statistic $OUT_STATS | \
   sed s/pro_// | \
   sed '1 s/statistic/deme/' > $FULL_DEME_LIST
 
+if [[ `grep _ $FULL_DEME_LIST` != "" ]]
+then
+  echo "WARNING: Deme names with underscores ( '_' ) are not supported; You may get a bonkerz migration rate plot." > /dev/stderr
+fi
+
+
 # Specify colors
 COMMON_ARGS="$COMMONR -d $FULL_DEME_LIST"
 if [[ $COLOR_SELECTOR == "brewer" ]]
