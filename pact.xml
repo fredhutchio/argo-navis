@@ -48,11 +48,9 @@
         help="As with the Tip selection, you have the choice of restricting the anlayses to a particular time
         range wihtin the tree.">
         <option value="all" selected="true">Don't restrict time range</option>
-        <option value="mrca">Time to MRCA of selected tips</option>
         <option value="custom">Custom time range</option>
       </param>
       <when value="all"/>
-      <when value="mrca"/>
       <when value="custom">
         <param name="start" type="float" value="1.0" label="Start time"
           help="The age of the oldest ancestry which should be considered (as a positive number)."/>
