@@ -167,6 +167,7 @@
     <data name="logfile" format="tabular" label="BEAST logfile"/>
     <data name="treefile" format="nex" label="BEAST treefile"/>
     <data name="statefile" format="text" label="BEAST state file"/>
+    <data name="ess" format="html" label="BEAST effective sample size stats"/>
 
     <data name="formatted_beastfile" format="xml" label="BEAST config file">
       <filter>resume['selector'] != "true"</filter>
@@ -254,6 +255,8 @@ DOWNSAMPLING_RANDOM_SEED="${downsampling.random_seed}"
 
 LOGFILE="${logfile}"
 TREEFILE="${treefile}"
+ESS="${ess}"
+
 #if $resume.selector != "true"
 FORMATTED_BEASTFILE="${formatted_beastfile}"
 #else
