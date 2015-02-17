@@ -25,16 +25,23 @@ deme.colors <- deme.factor$colors
 # We will be doing a separate geom data setting for the tip coloring and such
 tips.data <- subset(data, klass == "tip")
 
+# Computing some values for getting spacing/padding right for tips
+x.range <- abs(min(data$x) - max(data$x))
+x.end <- max(data$x) + (x.range * 0.13)
+print(c(min(data$x), max(data$x), x.range, x.end))
+
+# Move the tips names over just a touch from the dots
+label.nudge <- x.range * 0.01
+
+
 # Go to town plotting
 gg <- ggplot(data, aes(x=x, y=y, color=label, fill=label))
 gg <- gg + geom_segment(aes(xend=parent_x, yend=parent_y))
 gg <- gg + scale_color_manual(values=deme.colors)
-gg <- gg + geom_text(aes(x=x+0.01, y=y, label=sequence, hjust=0), color="black", size=1.8)
+gg <- gg + geom_text(aes(x=x+label.nudge, y=y, label=sequence, hjust=0), color="black", size=1.8)
 gg <- gg + geom_point(aes(color=label), data=tips.data)
 gg <- gg + theme_bw()
 # Add some padding for the label names on right
-x.range <- abs(min(data$x) - max(data$x))
-x.end <- max(data$x) + (x.range * 0.1)
 gg <- gg + xlim(min(data$x), x.end)
 gg <- gg + theme(axis.text.y=element_blank(),
                  axis.ticks.y=element_blank(),
