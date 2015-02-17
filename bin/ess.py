@@ -18,10 +18,15 @@ doc_template = """
     <h2>Explanation</h2>
     <p>
         Ideally, you want all these values to be greater than or equal to 200.
-        If any of them aren't, it's probably a good idea to do a "Resume" run, as described in the BEAST
-        documentation.
-        On average, running 3x as long will roughly increase your ESS by 3.
+        If any of them aren't, it's probably a good idea to perform a Resume run with BEAST.
+        On average, running 3x as long will increase your ESS by 3.
         This should help give you some sense of how much longer you should run BEAST.
+    </p>
+    <p>
+        Note that while ESS statistics are valuable for getting a rough sense of whether to run or not, it is
+        <em>always</em> recommended that you manually look at your logfile traces using
+        <a href="http://tree.bio.ed.ac.uk/software/tracer/">Tracer</a>, or another trace analysis software before
+        accepting your analysis as "final".
     </p>
 
     <h2>Detailed Results</h2>
@@ -33,7 +38,15 @@ doc_template = """
 </html>
 """
 
-tr_template = "<tr><td>{parameter}</td><td>{ess}</td></tr>"
+tr_template = "<tr><td>{parameter}</td><td {style}>{ess}</td></tr>"
+
+
+def format_tr(result):
+    "Takes a result [param, ess] pair and makes the appropriate tr html"
+    param, ess = result
+    passes = ess >= 200
+    style = "" if passes else 'style="color: red;"'
+    return tr_template.format(parameter=param, ess=ess, style=style)
 
 
 def dict_reader_to_cols(dict_reader):
@@ -57,7 +70,7 @@ def dict_reader_to_cols(dict_reader):
 
 
 def table_contents(results):
-    trs = [tr_template.format(parameter=result[0], ess=result[1]) for result in results]
+    trs = [format_tr(result) for result in sorted(results)]
     return "\n".join(trs)
 
 
@@ -83,7 +96,8 @@ def main(args):
     data_columns = dict_reader_to_cols(reader)
     results = []
     for colname, data in data_columns.iteritems():
-        results.append([colname, bs.effectiveSampleSize(data)])
+        if colname != "Sample":
+            results.append([colname, bs.effectiveSampleSize(data)])
 
     if args.html_out:
         html_content = html_contents(results)
