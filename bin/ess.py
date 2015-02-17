@@ -41,10 +41,10 @@ doc_template = """
 tr_template = "<tr><td>{parameter}</td><td {style}>{ess}</td></tr>"
 
 
-def format_tr(result):
+def format_tr(result, threshold=200):
     "Takes a result [param, ess] pair and makes the appropriate tr html"
     param, ess = result
-    passes = ess >= 200
+    passes = ess >= threshold
     style = "" if passes else 'style="color: red;"'
     return tr_template.format(parameter=param, ess=ess, style=style)
 
@@ -69,14 +69,14 @@ def dict_reader_to_cols(dict_reader):
     return d
 
 
-def table_contents(results):
-    trs = [format_tr(result) for result in sorted(results)]
+def table_contents(results, threshold=200):
+    trs = [format_tr(result, threshold) for result in sorted(results)]
     return "\n".join(trs)
 
 
-def html_contents(results):
-    table_content = table_contents(results)
-    within_tol = [x[1] > 200 for x in results]
+def html_contents(results, threshold):
+    table_content = table_contents(results, threshold)
+    within_tol = [x[1] > threshold for x in results]
     ess_good = all(within_tol)
     status = "Good to go" if all(within_tol) else "Should run longer"
     return doc_template.format(status=status, table_content=table_content)
@@ -86,7 +86,11 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('logfile', type=argparse.FileType('r'))
     parser.add_argument('ess_out', type=argparse.FileType('w'))
-    parser.add_argument('--html-out', action="store_true", help="Default is CSV output")
+    parser.add_argument('-t', '--threshold', type=float, default=200,
+            help="""For formatting html, what's the minimal ESS score to be considered high enough?
+            (default: 200""")
+    parser.add_argument('--html-out', action="store_true",
+        help="Default is CSV output")
     return parser.parse_args()
 
 
@@ -100,7 +104,7 @@ def main(args):
             results.append([colname, bs.effectiveSampleSize(data)])
 
     if args.html_out:
-        html_content = html_contents(results)
+        html_content = html_contents(results, args.threshold)
         args.ess_out.write(html_content)
     else:
         writer = csv.writer(args.ess_out)
