@@ -146,8 +146,8 @@ cp beastfile.xml.state $STATEFILE
 
 if [ $RESUME_SELECTOR == "true" ]
 then
-  posterior_subset.clj -t logfile -c $RESUME_SAMPLES $LOGFILE $TRIMMED_LOGFILE
-  posterior_subset.clj -t treefile -c $RESUME_SAMPLES $TREEFILE $TRIMMED_TREEFILE
+  posterior-subset -t logfile -c $RESUME_SAMPLES $LOGFILE $TRIMMED_LOGFILE
+  posterior-subset -t treefile -c $RESUME_SAMPLES $TREEFILE $TRIMMED_TREEFILE
   ess.py --html-out $TRIMMED_LOGFILE $ESS
 else
   ess.py --html-out $LOGFILE $ESS
