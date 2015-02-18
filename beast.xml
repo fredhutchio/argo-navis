@@ -1,5 +1,5 @@
-<tool id="ARGO_beast_run" name="Run Beast" version="1.0.0">
-  <description>Perform a discrete trait ancestral reconstruction analysis (al a Migrate) using BEAST</description>
+<tool id="ARGO_beast_run" name="Run BEAST" version="1.0.0">
+  <description>Perform a discrete trait ancestral reconstruction analysis using BEAST</description>
   <macros>
     <import>macros.xml</import>
   </macros>
@@ -22,15 +22,15 @@
       </param>
       <when value="file">
         <param name="file" type="data" format="fasta" label="Sequence alignment"
-          help="This is optional if you want to use the alignment in the BEAST file."/>
+          help="This is optional if you want to use the alignment in the BEAST config file."/>
       </when>
       <when value="in_beastfile"/>
     </conditional>
 
     <conditional name="metadata">
       <param name="specification" type="select" label="Metadata specification"
-        help="BEAST needs to know how sequences split into demes, and whether there is date information.
-        You can either specify a CSV metadata file, or regular expressions for extrating this data from sequence names.">
+        help="Argo Navis needs to know how sequences split into demes, and whether there is date information.
+        In this menu, you can specify whether you want to use a CSV metadata file, or regular expressions for extracting this data from sequence names.">
         <option value="file" selected="true">Metadata file</option>
         <option value="regex">From sequence names</option>
         <option value="in_beastfile">Use mappings in BEAST config file</option>
@@ -46,7 +46,7 @@
       <!--XXX - Have to tune these regular expressions-->
       <when value="regex">
         <param name="deme_regex" type="text" value="^[^\s\|]+\|([^\|\s]+)" label="Deme name regular expression"
-          help="Defaults to second value in a 2-ple or triple of '|' separated values.
+          help="Defaults to second value in a 2-tuple or triple of '|' separated values.
           For help working with regular expressions, see rubular.com.
           Use (...) to capture the part of the match you want to extract as the deme name.">
           <sanitizer>
@@ -60,7 +60,7 @@
         </param>
         <param name="date_regex" type="text" value="^[^\s\|]+\|(?:[^\|\s]+)\|([\d]+\.?[\d]*)"
           label="Date regular expression" optional="true"
-          help="This regular expression should extract an integer value, which can be interpetted as a time value.
+          help="This regular expression should extract an integer value, which can be interpreted as a time value.
           Whether it is years, months, days (etc.) is up to you.">
           <sanitizer>
             <valid initial="string.printable">
@@ -302,7 +302,7 @@ Input files
 
 To run this tool, you'll need some sequence data, and a way to specify which sequences belong to which demes.
 The recommended way of doing this is to specify a FASTA sequence file of sequences, and a separate metadata CSV file with
-additionl information.
+additional information.
 Beyond deme specifications, this metadata file may also specify date information for your sequences.
 
 An alternative which is still under development XXX, is to have deme and optionally date information encoded into the
@@ -310,12 +310,12 @@ sequence names.
 You will be able to specify regular expressions in order to extract this information.
 
 The last option is specification of this information directly through a BEAST XML config file.
-You can download Beauti [link], install the BEAST Classic module XXX, and then load the template file available here:
+You can download BEAUti [link], install the BEAST Classic module XXX, and then load the template file available here:
 
 XXX
 
 Once you have that loaded into BEAUti, you can replace the sequence data in there with your own.
-Once you've made changes to your config file, you can select "Custom or resume" from "Beast file specification", and specify
+Once you've made changes to your config file, you can select "Custom or resume" from "BEAST file specification", and specify
 the new BEAST file you've created and uploaded into Galaxy.
 However, you will also have to specify under "Sequence Alignment XXX" and "Metadata specification" that you wish to use the
 data in this file.
@@ -332,8 +332,8 @@ Some notes to keep in mind if you specify your own BEAST config:
 1. If you choose to specify the deme/community information directly in the your BEAST file and not apply the CSV or regular
    expression data to set this, you must name your discrete trait `deme`, even if it's not deme, but something else, like
    species name or tissue type.
-2. Note that the chain length and sampling interval settings in your beastfile will get overriden by whatever is specified
-   here in this tool, and can not be assumed to remain as specified in your beastfile.
+   2. Note that the chain length and sampling interval settings in your BEAST config file will get overridden by whatever is
+   specified here in this tool, and can not be assumed to remain as specified in your BEAST config file.
 3. If you don't have tip dates, you can speed up your run by specifying a custom beast file where your fixed clock's rate isn't
    estimated but left constant. If you don't have any temporal data, these estimates won't mean anything anyway.
 4. Main logfile must output to ``posterior.log`` and the trait trees to ``posterior.trait.trees`` [XXX].
@@ -407,13 +407,13 @@ Argo Navis provides downsampling tools which help you towards this end.
 There are two downsampling methods you can use: Random and K-means.
 Random downsampling is meant to deal with issues of only sampling depth, while K-means downsampling is meant to
 address issues of sampling bias.
-While Radnom downsamling is likely fairly straight-forward, K-means downsampling may not be.
+While Random downsamling is likely fairly straight-forward, K-means downsampling may not be.
 
 K-means downsampling starts by clustering sequences together into K clusters.
 From each of these clusters a single sequence is chosen to represent the entire cluster.
 This is done for each deme.
 This method introduces intentional, but controlled sampling bias, as for any given number of K samples per
-deme, the sequences chosen are going to reflect the *most* diversity possible among those seqeuences.
+deme, the sequences chosen are going to reflect the *most* diversity possible among those sequences.
 While this doesn't *solve* the problem of sampling bias, it does attempt to put all demes on equal footing, by
 introducing similar diversity bias in all sequences.
 
@@ -427,7 +427,7 @@ you've thoroughly explored the issue.
 On a final note, if you *do* decide to use BEAST's downsampling functionality, you will obtain a couple of additional
 outputs for your convenience:
 
-**Downsampled alignment**: The sequences kept in the the downsampling will be returned.
+**Downsampled alignment**: The sequences kept in the downsampling will be returned.
 This may be useful for tracking which sequences were kept in the analysis, as well as serve as an input to other analyses
 you may wish to perform with the downsampled data.
 
@@ -455,7 +455,7 @@ Getting things into PACT
 
 Once you're done with this tool, you'll want to take your **trimmed BEAST treefile** and use that as input for your PACT run.
 The PACT tool has it's own documentation, so you'll want to head over there for further instruction.
-Sionara.
+Sayonara.
 
 
 Citation

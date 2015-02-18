@@ -1,5 +1,5 @@
-<tool id="ARGO_NAVIS" name="Argo Navis" version="1.0.0">
-  <description>A quick introduction</description>
+<tool id="ARGO_NAVIS" name="Introduction" version="1.0.0">
+  <description>to Argo Navis</description>
   <help>
 
 
@@ -26,7 +26,7 @@ How Argo Navis is set up
 ------------------------
 
 Argo Navis uses BEAST to perform it's phylogenetic and discrete trait analyses.
-Setting up a configuration file to run with BEAST, and getting all of the settings just can be duanting for beginners.
+Setting up a configuration file to run with BEAST, and getting all of the settings just can be daunting for beginners.
 For this reason, Argo Navis' BEAST tool automates as much of this work as possible, requiring you only to specify your sequence and discrete
 trait data.
 It also provides a number of powerful options for dealing with some of the finer points of settings up more custom analyses, all
@@ -41,8 +41,8 @@ But as with BEAST, Argo Navis wraps many of the features you'd most commonly wan
 While Argo Navis can't expose all of the powerful features of both programs, it should help considerably with folks getting started doing
 discrete state ancestral analyses.
 
-For more help with the individual tools, including usage, and how to interpret the outputs, plesae see the documentation for each of
-the two compoonents.
+For more help with the individual tools, including usage, and how to interpret the outputs, please see the documentation for each of
+the two components.
 
 
 Resources

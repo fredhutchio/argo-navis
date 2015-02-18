@@ -171,10 +171,10 @@ PACTS power and flexibility is due largely to it's combination of
 2. Ability to subset the posterior trees, to focus on statistics related to specific questions
 3. The above features compose
 
-This means you can ask very ponited question about particular aspects of your evolutionary histories.
+This means you can ask very pointed question about particular aspects of your evolutionary histories.
 For example, if a virus has infected a several populations, you might be interested in where the viruses infecting one of them came from.
 To determine this, you could hone in on the parts of the tree leading to the population of interest, and perhaps even restrict to time
-window around when transmission into that group occured.
+window around when transmission into that group occurred.
 Within the context of this restriction, you could look at the proportions of tree length associated with each population, across all of
 the trees in the posterior sample [XXX add reference to simple posterior explanation?].
 Additionally, you could analyze within this restrictions the number of transmissions into the population of interest from each of the
@@ -184,13 +184,13 @@ other populations, and even estimate the rate of such transmissions.
 What Argo Navis' PACT wrapper produces
 --------------------------------------
 
-Again, while PACT is a very powerful and versitile tool, for the sake of making it easier to use, we focus on a limited set of functionality.
+Again, while PACT is a very powerful and versatile tool, for the sake of making it easier to use, we focus on a limited set of functionality.
 Specifically, we produce a single PDF document with several plots and figures, and a table of statistics, as well as all of the raw data files
 produced by PACT in case you'd like to do something more custom with them.
 
 The following figures are produced in the output PDF file:
 
-1. **Maximumum likelihood ancestral state tree**: This is the tree from the posterior trees with the highest likelihood.
+1. **Maximum likelihood ancestral state tree**: This is the tree from the posterior trees with the highest likelihood.
    It is colored by deme, and shows one possible history of how the discrete trait may have evolved along with the molecular sequences.
    Do keep in mind though, this is only the *most likely* evolutionary course of the molecules and demes under study.
    It's possible the rest of the posterior sample looks quite different, and this should be taken into account when analyzing results.
@@ -203,7 +203,7 @@ The following figures are produced in the output PDF file:
 3. **Migration rates**: As mentioned above, migration rates can be estimated based on the posterior trees.
    This is graphically represented via a table of boxplots, representing the mean and 95% confidence intervals of the migration rates to and
    from each population.
-   The rows of this table correpsond to migration "origin", and the columns correpond to "destination".
+   The rows of this table correspond to migration "origin", and the columns correspond to "destination".
    Additionally, the boxes are colored by migration origin, with the same scheme as used for other plots.
 4. **Additional statistics**: Additional statistics are presented in textual table format.
 
