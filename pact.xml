@@ -74,9 +74,11 @@
         help="By default, the colors used in plots are automatically chosen for you.
         However, you can either specify your own semi-automatic color scheme using Colorbrewer, or
         for full control a CSV file mapping demes to colors.">
-        <option value="brewer" selected="true">Color brewer spec</option>
+        <option value="default" selected="true">Default</option>
+        <option value="brewer">Color brewer theme</option>
         <option value="file">Color spec file</option>
       </param>
+      <when value="default"/> <!--Nothing-->
       <when value="brewer">
         <param name="brewer" type="text" value="RdBu" label="Deme and optionally date information"
           help="A valid colorbrewer2 color scheme name. See http://colorbrewer2.org/ for details."/>
@@ -128,7 +130,10 @@ TIME_RANGE_END=""
 #end if
 
 COLOR_SELECTOR="${color.selector}"
-#if $color.selector == "brewer"
+#if $color.selector == "default"
+COLOR_SELECTOR="brewer"
+COLOR_BREWER="RdBu"
+#else if $color.selector == "brewer"
 COLOR_BREWER="${color.brewer}"
 #else
 COLOR_FILE="${color.file}"
