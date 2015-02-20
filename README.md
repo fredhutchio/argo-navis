@@ -39,8 +39,8 @@ First, uncomment these and add `.sample` to the end of each of these files.
 Then, add the `datatypes_conf.xml` and `tool_conf.xml` files to the end of these lines so they look like this:
 
 ```
-datatypes_config_file = <whateveryouhadbefor>,argo-navis/datatypes_conf.xml
-tool_config_file = <whateveryouhadbefor>argo-navis/tool_conf.xml
+datatypes_config_file = <whateveryouhadbefor>,tools/argo-navis/datatypes_conf.xml
+tool_config_file = <whateveryouhadbefor>tools/argo-navis/tool_conf.xml
 ```
 
 #### b) Friendly hosts/ports
