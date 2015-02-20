@@ -61,7 +61,7 @@ def get_row(parsed_tree, n_id):
 def parsed_to_table(parsed_tree):
     # Cols are going to be:
     #   id, parent_id, label, klass, name, x, y, parent_x, parent_y, 
-    for n_id in parsed_tree['tips'] + parsed_tree['trunk_nodes']:
+    for n_id in parsed_tree['coordinates'].keys():
         yield get_row(parsed_tree, n_id)
 
 
