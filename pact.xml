@@ -11,8 +11,7 @@
   </stdio>
   <inputs>
 
-    <!--XXX need to make this optional-->
-    <param name="treefile" type="data" format="trees" label="BEAST treefile"
+    <param name="treefile" type="data" format="nex" label="BEAST treefile"
       help="This should be the 'BEAST treefile' from your most recent run of BEAST.
       If you did a 'Resume' run, you should use the 'Trimmed' treefile."/>
 
