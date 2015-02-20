@@ -42,10 +42,10 @@ gg <- ggplot(stats)
 gg <- gg + geom_crossbar(aes(x=mig_to, y=mean, ymin=lower, ymax=upper, fill=mig_from))
 gg <- gg + facet_grid(mig_from ~ .)
 gg <- gg + scale_fill_manual(values=deme.colors, name="source host group")
-gg <- gg + scale_y_sqrt()
+#gg <- gg + scale_y_sqrt()
 gg <- gg + labs(y="")
 gg <- gg + theme_bw()
-gg <- gg + xlab("target host group")
+gg <- gg + xlab("target deme")
 gg <- gg + labs(title="Migration rate comparison")
 
 
