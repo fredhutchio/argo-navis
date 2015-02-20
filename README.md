@@ -2,7 +2,9 @@
 # Argo Navis
 
 **Argo Navis** is a *set* of Galaxy tools designed for carrying out *Ancestral Discrete Trait* analyses, for phylogeographics and molecular epidemiology.
-It does this in a Bayesian setting, using BEAST to produce posteriors, and PACT as an analysis tool to extract information from these posteriors.
+It does this in a Bayesian setting, using [BEAST2](http://beast2.org) to produce posteriors, and [PACT](http://bedford.io/projects/PACT/) as an analysis tool to extract information from these posteriors.
+
+For more information about the tool, please see the help section of the `introduction.xml` "tool".
 
 
 ## Running in dev mode
@@ -16,7 +18,7 @@ I _know_.
 `sudo apt-get install mercurial` if you don't have `hg` already.
 Then run the above and `cd galaxy-central`.
 
-### 2. Next clone _this_ repo into `tools/hutch`
+### 2. Next clone _this_ repo into `tools/argo-navis`
 
 ```git clone git@github.com:fredhutchio/argo-navis.git tools/argo-navis```
 
