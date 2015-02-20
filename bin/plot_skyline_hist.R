@@ -31,10 +31,10 @@ deme.colors <- deme.factor$colors
 
 gg <- ggplot(data, aes(x=time, y=mean, fill=statistic))
 gg <- gg + geom_bar(stat="identity")
-gg <- gg + scale_fill_manual(values=deme.colors, name="host group")
+gg <- gg + scale_fill_manual(values=deme.colors, name="deme")
 gg <- gg + theme_bw()
 gg <- gg + xlab("evolutionary distance")
-gg <- gg + ylab("ancestral host group proportion")
+gg <- gg + ylab("ancestral deme proportion")
 gg <- gg + labs(title="Skyline proportions histogram")
 
 ggsave(args$output, gg, width=7, height=4.3)
