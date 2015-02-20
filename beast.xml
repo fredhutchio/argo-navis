@@ -356,7 +356,7 @@ This has been modified to include sequence, deme, and date information, as well 
 
 In order to start a Resume run, start by entering the number of new samples you'd like to add to the data you've already collected.
 Next, in the "BEAST file specification" input, select "Custom or Resume".
-This will open up a file input from which you can select the BEAST config file form the previous run.
+This will open up a file input from which you can select the BEAST config file from the previous run.
 Next, select "Yes" in the "Resume from a previous run?" form input.
 This will open up several new input fields where you can specify the logfile, treefile and statefile from your previous run.
 
@@ -445,7 +445,7 @@ Simply go to File > Manage Packages, click on "BEAST_CLASSIC", then click "Insta
 You can now go to File > Load to select the default BEAST config file.
 Once you've made your edits, save your new config file by going to File > Save As.
 You can then upload the file into Galaxy by going to Get Data > Upload File within the Galaxy Tool menu, making sure to
-specify XML as the file type.
+specify "beastfile" as the file type.
 
 Once you have your file loaded, select "Custom or resume" from "BEAST file specification", and point the file selector that pops
 up to the new config file you just uploaded.
