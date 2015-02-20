@@ -97,7 +97,7 @@
       </param>
       <when value="default"/>
       <when value="custom">
-        <param name="template" type="data" format="xml" label="BEAST file XML template"
+        <param name="template" type="data" format="beastfile" label="BEAST config file"
           help="Note that any alignment or deme/date data specified above will override whatever is present in this file.
           However, having this data specified in a custom file means you can forgo the inputs above."/>
       </when>
@@ -150,11 +150,11 @@
         <!--Do nothing-->
       </when>
       <when value="true">
-        <param name="logfile" type="data" format="txt" label="Logfile from last run"
+        <param name="logfile" type="data" format="log" label="Logfile from last run"
           help="Cannot be the 'trimmed' output from previous run, but must be the full output."/>
-        <param name="treefile" type="data" format="txt" label="Treefile from last run"
+        <param name="treefile" type="data" format="trees" label="Treefile from last run"
           help="As with the Logfile, cannot be the `trimmed` output."/>
-        <param name="statefile" type="data" format="txt" label="State file from previous run."/>
+        <param name="statefile" type="data" format="statefile" label="State file from previous run."/>
         <param name="samples" type="integer" value="10000" label="Number of samples to keep"
           help="With resume runs, the log and tree files can grow quite large, bogging down PACT and other analysis tools.
           Therefore, after a resume run, 'trimmed' output files are created with this number of samples."/>
@@ -164,12 +164,12 @@
   </inputs>
 
   <outputs>
-    <data name="logfile" format="tabular" label="BEAST logfile"/>
-    <data name="treefile" format="nex" label="BEAST treefile"/>
-    <data name="statefile" format="text" label="BEAST state file"/>
+    <data name="logfile" format="log" label="BEAST logfile"/>
+    <data name="treefile" format="trees" label="BEAST treefile"/>
+    <data name="statefile" format="statefile" label="BEAST state file"/>
     <data name="ess" format="html" label="BEAST effective sample size stats"/>
 
-    <data name="formatted_beastfile" format="xml" label="BEAST config file">
+    <data name="formatted_beastfile" format="beastfile" label="BEAST config file">
       <filter>resume['selector'] != "true"</filter>
     </data>
     <data name="downsampled_alignment" format="fasta" label="Downsampled alignment">
@@ -178,10 +178,10 @@
     <data name="downsampled_metadata" format="csv" label="Downsampled metadata">
       <filter>downsampling['method'] != "none" and metadata['specification'] == "file"</filter>
     </data>
-    <data name="trimmed_logfile" format="tabular" label="Trimmed BEAST logfile">
+    <data name="trimmed_logfile" format="log" label="Trimmed BEAST logfile">
       <filter>resume['selector'] == "true"</filter>
     </data>
-    <data name="trimmed_treefile" format="nex" label="Trimmed BEAST treefile">
+    <data name="trimmed_treefile" format="trees" label="Trimmed BEAST treefile">
       <filter>resume['selector'] == "true"</filter>
     </data>
   </outputs>
