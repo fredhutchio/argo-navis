@@ -10,6 +10,9 @@ Argo Navis
 **Argo Navis** is a *set* of tools designed for carrying out *Ancestral Discrete Trait* analyses, for phylogeographics or molecular epidemiology.
 It does this in a Bayesian setting, using BEAST to produce posteriors, and PACT as an analysis tool to extract information from these posteriors.
 
+It is recommended you read this entire introduction, and follow through the tutorial below for an overview of how Argo Navis works and how to use it.
+From there, you can follow up with documentation in the individual tools for more detailed information and instruction as needed.
+
 
 About discrete traits
 ---------------------
@@ -17,48 +20,163 @@ About discrete traits
 In general, a *discrete trait* is one which takes on some finite number of values.
 In a phylogenetic setting, a discrete trait can represent geographical location, host species of a virus, or tissue compartment of a host.
 We can model evolutionary histories in such a way that transitions in this discrete trait are accounted for.
-This transitions might represent physical migration of organisms, or transmission of a virus from one host group to another.
-Within this model we can think about the rate of transitions from one trait to another as the rate of migration from one location to another,
-or the rate of zoonoses from one organism to another.
+These transitions might represent physical migration of organisms, transmission of a virus from one host species to another,
+or tropism of viruses between different host tissues.
+Modelling these states and their transitions produces information relevant to the biological characteristics they represent.
+
+Through the course of this documentation, we'll frequently refer to the discrete traits as *demes*.
+The word *deme* comes from population genetics (as in the root of *demographics*), where much of the foundational theory for these analyses was developed.
+However, this is for convenience, and does not preclude usage of this tool for other use cases.
 
 
 How Argo Navis is set up
 ------------------------
 
 Argo Navis uses BEAST to perform it's phylogenetic and discrete trait analyses.
-Setting up a configuration file to run with BEAST, and getting all of the settings just can be daunting for beginners.
-For this reason, Argo Navis' BEAST tool automates as much of this work as possible, requiring you only to specify your sequence and discrete
-trait data.
-It also provides a number of powerful options for dealing with some of the finer points of settings up more custom analyses, all
-of which can be configured through dropdown menus and text fields.
+While BEAST is a powerful tool, it can be daunting to set up for beginners.
+Argo Navis automates much of this setup, requiring you only to specify your sequence and discrete trait data.
+However, it also exposes the options most pertinent to ancestral discrete trait analyses in a friendly manner.
 
-The second component of Argo Navis is PACT (Posterior Analysis of Coalescent Trees), developed by Trevor Bedford.
-PACT takes the labeled trees output file from BEAST, and performs highly customizable and flexible analyses from it.
-However, PACT is perhaps even more daunting to use than BEAST, as it's only configurable through text files which instruct PACT
-as to the analyses it must perform.
-But as with BEAST, Argo Navis wraps many of the features you'd most commonly want to use into a simple Graphical interface.
-
-While Argo Navis can't expose all of the powerful features of both programs, it should help considerably with folks getting started doing
-discrete state ancestral analyses.
-
-For more help with the individual tools, including usage, and how to interpret the outputs, please see the documentation for each of
-the two components.
+The second component of Argo Navis uses PACT (Posterior Analysis of Coalescent Trees), developed by Trevor Bedford.
+PACT takes the labeled tree output file from BEAST, and performs highly customizable analyses on it.
+While, like BEAST, PACT can be daunting to set up and run for beginners, Argo Navis wraps the features you'd most commonly use into a simple interface.
 
 
-Resources
----------
+BEAST takes a long time to run
+------------------------------
 
-The following are some studies that have used some or all of these methods for discrete trait ancestral analysis:
+In case you're not already aware, BEAST can take quite a while to run for a real analysis.
+Analyses frequently take hours, days, even weeks, depending on the amount of data and complexity of the analysis.
+However, when you first run the Argo Navis BEAST tool, you'll notice that it runs in a few minutes on most datasets.
+These default settings are intended for quickly running your data, to make sure things are set up properly.
 
-* flu study
-* astv study
-* phylogeo examples?
+Once you've seen your data from one end of the tool to the other, you'll likely need to greatly increase the sampling interval.
+Then once your first *real* run has completed, you'll need to check that it ran long enough.
+If it did not, you can perform a Resume run, to pick up where you left off.
+All this functionality is covered below, and in detail in the documentation residing within the BEAST tool.
 
 
-Matsen FA IV, Small CT, Soliven K, Engel GA, Feeroz MM, et al. (2014) `A Novel Bayesian Method for Detection of APOBEC3-Mediated Hypermutation and Its Application to Zoonotic Transmission of Simian Foamy Viruses`_. PLoS Comput Biol 10(2): e1003493. doi:10.1371/journal.pcbi.1003493
+A brief tutorial
+----------------
 
-.. _wiki documentation: https://github.com/fhcrc/hyperfreq/wiki/Reference-sequence-strategies
-.. _A Novel Bayesian Method for Detection of APOBEC3-Mediated Hypermutation and Its Application to Zoonotic Transmission of Simian Foamy Viruses: http://www.ploscompbiol.org/article/info:doi/10.1371/journal.pcbi.1003493
+The following is a brief walk through of how to use Argo Navis.
+
+First download the `sample data`_ you'll be using with this tutorial.
+After unzipping the contents, you'll find three files: an alignment FASTA file, a metadata CSV file, and a color specification CSV file.
+Before moving forward, it's worth opening these up in a text file and/or Excel to get a sense for what's in each.
+
+**Loading Data**
+
+First lets load this data into the Galaxy tool.
+You can do this by following ``Get Data > Upload File`` in the Tools menu on the left hand side of this page.
+This will bring up a box into which you can drag the files you downloaded.
+When you do this, you should notice the file names show up in the box.
+
+Next specify the file type for each of these files (unfortunately, the "Auto-detect" setting doesn't really work).
+The alignment file should be of type "fasta", and the other two files of type "csv".
+Once you've done this, click on the "Start" button of the mini-window.
+When the "Status" indicator reaches 100%, you can click "Close".
+Note that our files should now show up on the right side of the page, in the "History" panel.
+
+**Running BEAST**
+
+Now that we've loaded the data, we can start a BEAST run.
+Click "Run BEAST" in the Tool menu (just below where you clicked to get to this introduction) to open the tool.
+
+First, select the alignment file we just uploaded from the "Sequence alignment" file selector.
+Next, we'll specify our deme information using the metadata file we uploaded (you can also use regular expressions to parse
+this information out of the alignment file if you would rather).
+Click on the "Metadata file" selector, and point it to the metadata.csv.
+In our data, the "Deme column" is not named "deme" (the default), but "community".
+So in "Deme column" enter "community", so Argo Navis gets the right data.
+
+Now, we also happen to have sampling date information in our metadata file.
+We can tell Argo Navis to use this by clicking "Enable" next to "Date column", which will allow us to enter in
+"date_collected" for this value, to match that in the date column name in our metadata file.
+
+So the run goes quickly, decrease the sampling interval to "10".
+There are a number of other options we've ignored, but for now, let's keep it simple.
+
+Now that everything is set up, click the "Execute" button.
+You should now see some new files show up in the history, with spinners indicating that the run is still converging.
+
+**Checking Convergence**
+
+Once the new files turn green and the spinners stop, our run is complete.
+The very *first* thing we should do is look at the effective sample size (ESS) analysis of the run.
+
+Find the "BEAST effective sample size stats" output file, and click on the little eyeball icon associated with it (View Data).
+You should see a report with "Recommendation: Should run longer", since we didn't run BEAST for very long.
+Additionally, you should see a complete list of the ESS values of all the parameters in our model.
+
+**Running BEAST longer**
+
+Clearly we need to run BEAST longer.
+Go to "Run BEAST" in our Tool menu, then at the bottom select "Yes, please" for the "Resume from a previous run?" option.
+Once you select this, a number of additional option will open up.
+You must specify the "BEAST logfile", "BEAST treefile", and "BEAST state file" from your previous run for each of
+the respective inputs which appeared.
+Additionally, you will have to select "Custom or Resume" for "BEAST file specification" just above, and 
+specify the "BEAST config file" output by the last run of the tool.
+
+The last thing we'll need to do is decide how many new samples to draw.
+Let's set this value to 50,000, for 5x the number in our initial run.
+Once you've done this, Execute the tool once more.
+(Note that all of the other input parameters are useless when you do a Resume run, as the data in the BEAST config file will be used, and must be the same as the run being resumed).
+
+Once the run is complete, check the convergence as you did for the initial run, and note that the ESS values have improved.
+It probably *still* says that we need to run for longer, but this is okay now for illustrative purposes.
+
+Next take a look at the other output files we have.
+In addition to the files we had before, we also now have "Trimmed" versions of our logfile and treefile.
+Because Resume runs add to existing logfiles and treefiles, and must do so using the same sampling interval as we used for the initial (in this case much shorter) run, the complete versions of these files can be quite large, making further analysis more difficult.
+For this reason, trimmed versions of the files are produced.
+The *un*-trimmed versions should *only* be used for follow up Resume runs.
+The *trimmed* versions should be used for everything else.
+
+**Tracer**
+
+Once your run has passed the ESS tests (we're going to pretend ours have), it's a good idea to also run it through `Tracer`_.
+Tracer is a program for analyzing the logfiles produced by BEAST.
+It lets you directly analyze the shape of the parameter states explored, which is a good idea, even if the ESS values check out.
+It is also capable of a number of powerful analyses, such as testing for covariance between parameters of your model.
+For more information, see the `BEAST tutorial on Tracer`_.
+
+**PACT**
+
+Once your BEAST output has checked out via ESS and been run through Tracer, it's time to run PACT!
+First click on "Run PACT" in the "Tools" menu.
+The only *required* input is "BEAST treefile".
+However, as mentioned above, if you did a Resume run, you should use the "Trimmed BEAST treefile" output from yhour last run
+as the input for the PACT tool
+For this run, we'll leave all the other settings to their defaults.
+When you're ready, click "Execute".
+
+Once the runs have completed, click on the eye icon next to the "PACT figures" output.
+This will bring up the main results of the analysis: the maximum likelihood ancestral history, a skyline proportions histogram,
+and a migration rate plot.
+These outputs are all described in detail in the PACT tool's documentation.
+
+Where to go from here
+---------------------
+
+Start running your own data!
+Read some of the `BEAST tutorials`_, check out the `BEAST2 website`_, and look at the `Ancestral State Reconstruction tutorial`_
+upon which this tool is loosely based.
+
+It's also worth taking a look at the published literature showcasing applications of these methods:
+
+Bedford T, Cobey S, Beerli P, Pascual M. (2010) `Global migration dynamics underlie evolution and persistence of human influenza A (H3N2)`_. PLoS Pathog 6: e1000918.
+
+Hopefully, we'll be able to grow this list over time.
+
+.. _sample data: http://xxx.doesntexist.yet
+.. _Tracer: http://tree.bio.ed.ac.uk/software/tracer/
+.. _BEAST tutorial on Tracer: http://beast.bio.ed.ac.uk/analysing-beast-output
+.. _Ancestral State Reconstruction tutorial: http://beast-classic.googlecode.com/files/ARv2.0.1.pdf
+.. _BEAST tutorials: http://beast.bio.ed.ac.uk/tutorials
+.. _BEAST2 website: http://beast2.org/
+.. _Global migration dynamics underlie evolution and persistence of human influenza A (H3N2): http://bedford.io/papers/bedford-global-migration/
 
   </help>
 </tool>

@@ -48,7 +48,7 @@
         <param name="deme_regex" type="text" value="^[^\s\|]+\|([^\|\s]+)" label="Deme name regular expression"
           help="Defaults to second value in a 2-tuple or triple of '|' separated values.
           For help working with regular expressions, see rubular.com.
-          Use (...) to capture the part of the match you want to extract as the deme name.">
+          Use () to capture the part of the match you want to extract as the deme name.">
           <sanitizer>
             <valid initial="string.printable">
              <remove value="&apos;"/>
@@ -291,100 +291,95 @@ About this tool
 ---------------
 
 This tool is your starting point for running an Argo Navis analysis.
-It runs BEAST for you, and produces output files which you can use in the associated PACT tool for producing data
-visualizations and further analyses of your data.
-It has a number of features which make it easier to investigate aspects of your data, and automate the setup of the BEAST
-files and such.
+It runs BEAST for you, and produces a treefile suitable for running through the Argo Navis PACT tool, which facilitates
+visualization and analyses of your data.
 
 
 Input files
 -----------
 
 To run this tool, you'll need some sequence data, and a way to specify which sequences belong to which demes.
-The recommended way of doing this is to specify a FASTA sequence file of sequences, and a separate metadata CSV file with
-additional information.
-Beyond deme specifications, this metadata file may also specify date information for your sequences.
+The recommended way of doing this is to specify a FASTA file of aligned sequences, and a separate metadata CSV file with
+deme specifications.
+This metadata file may also be used to specify temporal information for your sequences.
+While the column names pointing to the deme and date information are configurable, there must be a "sequence" column
+corresponding to the names of the sequences in the FASTA file.
+Additionally, there must be no sequences represented in one file not represented in the other.
 
-An alternative which is still under development XXX, is to have deme and optionally date information encoded into the
-sequence names.
-You will be able to specify regular expressions in order to extract this information.
+It is also possible to specify deme and date information directly in the FASTA file sequence names using regular expressions.
+To do this, select "From  sequence names" from the "Metadata specification" dropdown.
+This will open up options for deme and date regular expressions which will be used to extract the information from
+the sequence names.
+The default behaviour is to parse the sequence names as "|" separated values like this: "name|deme|date".
+If you'd like help customizing these regular expressions, please see the `regex tutorial`_ and `rubular`_.
 
-The last option is specification of this information directly through a BEAST XML config file.
-You can download BEAUti [link], install the BEAST Classic module XXX, and then load the template file available here:
-
-XXX
-
-Once you have that loaded into BEAUti, you can replace the sequence data in there with your own.
-Once you've made changes to your config file, you can select "Custom or resume" from "BEAST file specification", and specify
-the new BEAST file you've created and uploaded into Galaxy.
-However, you will also have to specify under "Sequence Alignment XXX" and "Metadata specification" that you wish to use the
-data in this file.
-If you don't do this, whatever files/options are specified for Sequence alignment and Metadata specification will replace the
-data specified in your BEAST config file.
-
-Specifying your own BEAST config file is also useful if you wish to customize the model or priors of the analysis.
-Note, the default template closely follows the setup in the `Ancestral State Reconstruction tutorial`_ by Remco Bouckaert,
-which you can use as a guide for setting up your own custom BEAST analysis.
-The `BEAST homepage`_ is also a useful resource if you're looking for help settings things up.
-
-Some notes to keep in mind if you specify your own BEAST config:
-
-1. If you choose to specify the deme/community information directly in the your BEAST file and not apply the CSV or regular
-   expression data to set this, you must name your discrete trait `deme`, even if it's not deme, but something else, like
-   species name or tissue type.
-   2. Note that the chain length and sampling interval settings in your BEAST config file will get overridden by whatever is
-   specified here in this tool, and can not be assumed to remain as specified in your BEAST config file.
-3. If you don't have tip dates, you can speed up your run by specifying a custom beast file where your fixed clock's rate isn't
-   estimated but left constant. If you don't have any temporal data, these estimates won't mean anything anyway.
-4. Main logfile must output to ``posterior.log`` and the trait trees to ``posterior.trait.trees`` [XXX].
+For more custom analyses, you can also specify your own BEAST config file.
+This lets you customize model details, priors, and parameters.
+If you wish to do this, take a look at the **Customizing your BEAST config file** section below.
 
 
 Output files
 ------------
 
-The following two outputs of an initial run are your two most valuable:
+The following files are created as the result of an Argo Navis BEAST run:
 
-**BEAST logfile**: A standard BEAST logfile of sampled states and parameters, suitable use with Tracer.
+**BEAST logfile**: A standard BEAST logfile of sampled parameters, suitable for analysis with Tracer.
 
 **BEAST treefile**: A nexus file of trees from the posterior, with ancestral states labeled, suitable for
-being run through PACT.
+analysis with PACT.
 
-Once you've carried out a run, you must analyze the logfile to check for convergence.
-For the moment, you will have to do this using Tracer (we're hoping to provide some statistics in tool soon, though XXX),
-by downloading the treefile to your computer and loading it into Tracer.
-You should see some values on the left hand of the screen in the table under the ESS (Effective Sample Size) column.
-A good rule of thumb is that if any of these values are under 200, you should probably run BEAST for longer.
+**BEAST effective sample size stats**: Statistics about whether BEAST has run long enough.
+You can click on the eye icon next to this file to see this data in-browser.
+
+Once you've carried out a run, you should always check the ESS statistics before doing anything else.
+This file will contain a "Recommendation", indicating whether the data is ready to use, or whether you
+should run BEAST longer, and if so, how much longer.
+
+While the ESS statistic is an easy way to get a sense for whether your should run BEAST more or not, it's also
+a good idea to manually review the logfile using `Tracer`_, before accepting the results as final and
+passing them along through the rest of the analysis.
+Please see the tutorial in the Introduction for a description of how to do this.
 
 
 Resume runs
 -----------
 
-When you realize that you've spent a bunch of time running BEAST, only to find out that it hasn't run long enough,
-you can pick up right where you left off using this tools Resume functionality.
-You should note that in addition to the logfile and treefile from your last run, you should also have the following:
+If you run BEAST and realize it needs to run longer, you can save time by doing a "Resume" run.
+This let's you pick up from where you left off, keeping you from having to start over.
+
+Note that in addition to the output files listed above, an initial run of BEAST will also produce the following:
 
 **BEAST config file**: A copy of the BEAST file created for the run.
 This has been modified to include sequence, deme, and date information, as well as various other run settings.
 
-**BEAST state file**: This is a file that BEAST maintains as it runs so if you wish to restart the process, you won't
-be doing so from scratch.
+**BEAST state file**: This is a file that BEAST maintains as it runs so Resume runs can pick up where they left off.
 
 In order to start a Resume run, start by entering the number of new samples you'd like to add to the data you've already collected.
 Next, in the "BEAST file specification" input, select "Custom or Resume".
 This will open up a file input from which you can select the BEAST config file form the previous run.
 Next, select "Yes" in the "Resume from a previous run?" form input.
-This will open up several new input fields.
-Here you can specify the BEAST logfile, treefile and statefile from your previous run.
+This will open up several new input fields where you can specify the logfile, treefile and statefile from your previous run.
 
 You can also specify a total number of samples you want to keep.
 When running a Resume run, your log and tree files can grow large enough to bog down analysis tools.
-This tool returns versions of the log and tree files which have been evenly trimmed down to the specified number of samples
-to keep things manageable.
+This problem is dealt with by evenly trimming these files to the specified number of samples during Resume runs.
 It's important to note, however, that if you do further Resume runs, you must make sure to specify the **untrimmed** log and
-tree files for the following runs, or bad things will happen (someone will kill a puppy; seriously).
-It's also important to note that Resume runs ignore all inputs I haven't explicitly mentioned here.
-In particular, you can't change the sequences, the date information, deme specifications or sampling interval.
-If you **do** want to change any of this, you will have to start a new run.
+tree files for the following runs.
+If you don't, bad things will happen (someone will kill a puppy; seriously).
+
+It's also important to note that Resume runs ignore all inputs not explicitly mentioned above.
+In particular, you can't change the sequences, the date information, deme specifications or sampling interval for a Resume run.
+If you *do* want to change any of this, you must start a new run.
+
+
+Random seeds
+------------
+
+Both the actual BEAST run and the downsampling methods support specification of random seeds.
+Taking advantage of this aids in reproducibility of your analyses, as someone else running with the same data, settings and
+random seeds should be able to reproduce the results exactly.
+If you choose not to specify your own random seeds, random seeds will be chosen for you and printed out in the logs, so
+if you wish to go back and find these values, you can.
 
 
 Downsampling
@@ -392,22 +387,22 @@ Downsampling
 
 Differences in sampling between demes you study can be a challenge when doing these analyses.
 How do you know that one deme having been sampled more deeply isn't artificially biasing the results towards increased
-diversity?
-It's also frequently the case that researchers studying viruses don't submit every viral sequence they obtain, but go
-through some procedure for deciding which "look the same enough" to consider a single species, from which only one is
-submitted?
-How do you know this wouldn't artificially biases your results towards increased diversity for this deme, since at the
-same number of sequences, there would be an increased diversity coverage the ones with more coverage?
+diversity for that deme?
+It's also frequently the case that researchers studying viruses don't submit every viral sequence they obtain, but decide
+which look "different enough" from the others (and from those already observed) to submit to online repositories.
+And typically, the strategy used for deciding which sequences to submit and which not to is not made clear in publications.
+As such, treating sequences found in these repositories as an unbiased sample is problematic, and has even greater
+potential for introducing diversity bias into your results.
 
-Issues of sampling depth and sampling bias frequently come up in the review process.
-One way to deal with these issues is to show evidence that the sampling issues aren't significantly affecting the results,
+Issues such as these frequently come up in reviewer critiques.
+One way to deal with this is to show evidence that the sampling issues aren't significantly affecting the results,
 or at the very least, to explore the effects of different sampling strategies on the results.
 Argo Navis provides downsampling tools which help you towards this end.
 
 There are two downsampling methods you can use: Random and K-means.
 Random downsampling is meant to deal with issues of only sampling depth, while K-means downsampling is meant to
 address issues of sampling bias.
-While Random downsamling is likely fairly straight-forward, K-means downsampling may not be.
+While Random downsampling is likely fairly straight-forward, K-means downsampling may not be.
 
 K-means downsampling starts by clustering sequences together into K clusters.
 From each of these clusters a single sequence is chosen to represent the entire cluster.
@@ -425,43 +420,63 @@ If there are differences, there will be a bit more work involved in explaining t
 you've thoroughly explored the issue.
 
 On a final note, if you *do* decide to use BEAST's downsampling functionality, you will obtain a couple of additional
-outputs for your convenience:
+outputs:
 
-**Downsampled alignment**: The sequences kept in the downsampling will be returned.
-This may be useful for tracking which sequences were kept in the analysis, as well as serve as an input to other analyses
-you may wish to perform with the downsampled data.
+**Downsampled alignment**: The sequences kept in the downsampling process, in FASTA format.
 
-**Downsampled metadata**: If you supplied metadata for the analysis, you will also get this file.
-Like the Downsampled alignment, it will contain all the metadata for the sequences kept in the downsampling step.
+**Downsampled metadata**: If you supplied metadata for the analysis, you will also get a copy of that file containing
+metadata for only the sequences kept in the downsampling procedure.
 
-
-Random seeds
-------------
-
-Both the actual BEAST run and the downsampling methods support specification of random seeds.
-Taking advantage of this aids in reproducibility of your analyses, as someone merely has to go in and specify the same seeds
-to reproduce the results exactly.
-If you choose not to specify your own random seeds, random seeds will be chosen for you and printed out in the logs, so that
-if you wish to go back and reproduce something, you should be able to.
+These are not required for any other part of Argo Navis, but are offered for your convenience so you can see which
+sequences were chosen and use the same data subsets in other analyses you might perform outside of Argo Navis.
 
 
+Customizing your BEAST config file
+----------------------------------
+
+Customizing your BEAST config file opens up the full power of BEAST, letting you specify model details, priors, and
+other parameters.
+If you wish to do this, it's recommended you start by working from this tool's `default BEAST config file`_.
+From there, you can specify customizations using the BEAUti program, which is installed alongside BEAST2 (see the
+`BEAST2 homepage`_ for downloads).
+
+Before you can load the config file, you'll have to install the BEAST Classic module from within BEAUti.
+Simply go to File > Manage Packages, click on "BEAST_CLASSIC", then click "Install".
+You can now go to File > Load to select the default BEAST config file.
+Once you've made your edits, save your new config file by going to File > Save As.
+You can then upload the file into Galaxy by going to Get Data > Upload File within the Galaxy Tool menu, making sure to
+specify XML as the file type.
+
+Once you have your file loaded, select "Custom or resume" from "BEAST file specification", and point the file selector that pops
+up to the new config file you just uploaded.
+If you wish, you can also tell Argo Navis to use the alignment and deme data in the BEAST config file by selecting the
+appropriate options in the "Alignment specification" and "Metadata specification" dropdowns.
+If you don't do this, whatever files/options are specified for Sequence alignment and Metadata specification will replace the
+data specified in your BEAST config file.
+
+Some notes to keep in mind if you specify your own BEAST config:
+
+1. If you choose to specify the deme/community information directly in the your BEAST file and not apply the CSV or regular
+   expression data to set this, you must name your discrete trait "deme", even if it refers to something else, like
+   species name or tissue type.
+2. Note that the chain length and sampling interval settings in your BEAST config file will get overridden by whatever is
+   specified here in this tool, and can not be assumed to remain as specified in your BEAST config file.
+3. If you don't have tip dates, you can speed up your run by specifying a custom beast file where your fixed clock's rate isn't
+   estimated but left constant. If you don't have any temporal data, these estimates won't mean anything anyway.
+
+Note that the default template closely follows the setup in the `Ancestral State Reconstruction tutorial`_ by Remco Bouckaert,
+which you can use as a guide for setting up your own custom BEAST analysis.
+The `BEAST homepage`_ is also a useful resource if you're looking for help settings things up.
+
+
+
+.. _BEAST2 homepage: http://www.beast2.org/
+.. _default BEAST config file: http://xxx.doesntexist.yet
+.. _regex tutorial: http://regexone.com/lesson/0
+.. _rubular: http:rubular.com
 .. _Tracer: http://tree.bio.ed.ac.uk/software/tracer/
 .. _Ancestral State Reconstruction tutorial: http://beast-classic.googlecode.com/files/ARv2.0.1.pdf
-.. _BEAST homepage: http://beast-classic.googlecode.com/files/ARv2.0.1.pdf
-
-
-Getting things into PACT
-------------------------
-
-Once you're done with this tool, you'll want to take your **trimmed BEAST treefile** and use that as input for your PACT run.
-The PACT tool has it's own documentation, so you'll want to head over there for further instruction.
-Sayonara.
-
-
-Citation
---------
-
-Should cite the upcoming AstV paper and BEAST and Trevor's flu paper
+.. _BEAST homepage: http://beast.bio.ed.ac.uk/
 
 
   </help>
