@@ -4,6 +4,27 @@
 **Argo Navis** is a set of Galaxy tools to carry out Bayesian discrete phylogenetic trait analyses using [BEAST2](http://beast2.org) to sample posteriors and [PACT](http://bedford.io/projects/PACT/) to extract information from these posteriors.
 For background and more information, please see the help section of the `introduction.xml` "tool".
 
+## Dependencies
+
+Before running Argo Navis in either dev or production, there are a number of dependencies which must be installed:
+
+* BEAST2
+* PACT
+* R, and the following libraries
+    * RColorBrewer
+    * ggplot2
+    * gtable
+    * argparse
+* python, and the following libraries
+    * alnclst
+    * biopython
+    * biopy
+    * numpy
+    * csvkit
+    * svg_stack.py
+* inkscape
+* java
+
 
 ## Running in dev mode
 
