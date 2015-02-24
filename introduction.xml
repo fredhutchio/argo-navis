@@ -7,10 +7,8 @@ Argo Navis
 ----------
 
 
-**Argo Navis** is a *set* of tools designed for carrying out *Ancestral Discrete Trait* analyses, for phylogeographics or molecular epidemiology.
-It does this in a Bayesian setting, using BEAST to produce posteriors, and PACT as an analysis tool to extract information from these posteriors.
-
-It is recommended you read this entire introduction, and follow through the tutorial below for an overview of how Argo Navis works and how to use it.
+**Argo Navis** is a set of Galaxy tools to carry out Bayesian discrete phylogenetic trait analyses using [BEAST2](http://beast2.org) to sample posteriors and [PACT](http://bedford.io/projects/PACT/) to extract information from these posteriors.
+We recommend that you read this entire introduction, and follow through the tutorial below for an overview of how Argo Navis works and how to use it.
 From there, you can follow up with documentation in the individual tools for more detailed information and instruction as needed.
 
 
@@ -22,7 +20,7 @@ In a phylogenetic setting, a discrete trait can represent geographical location,
 We can model evolutionary histories in such a way that transitions in this discrete trait are accounted for.
 These transitions might represent physical migration of organisms, transmission of a virus from one host species to another,
 or tropism of viruses between different host tissues.
-Modelling these states and their transitions produces information relevant to the biological characteristics they represent.
+Modeling these states and their transitions produces information relevant to the biological characteristics they represent.
 
 Through the course of this documentation, we'll frequently refer to the discrete traits as *demes*.
 The word *deme* comes from population genetics (as in the root of *demographics*), where much of the foundational theory for these analyses was developed.
@@ -32,10 +30,10 @@ However, this is for convenience, and does not preclude usage of this tool for o
 How Argo Navis is set up
 ------------------------
 
-Argo Navis uses BEAST to perform it's phylogenetic and discrete trait analyses.
+Argo Navis uses BEAST to perform phylogenetic and discrete trait analyses.
 While BEAST is a powerful tool, it can be daunting to set up for beginners.
 Argo Navis automates much of this setup, requiring you only to specify your sequence and discrete trait data.
-However, it also exposes the options most pertinent to ancestral discrete trait analyses in a friendly manner.
+It also exposes the options most pertinent to ancestral discrete trait analyses in a friendly manner.
 
 The second component of Argo Navis uses PACT (Posterior Analysis of Coalescent Trees), developed by Trevor Bedford.
 PACT takes the labeled tree output file from BEAST, and performs highly customizable analyses on it.
@@ -46,12 +44,12 @@ BEAST takes a long time to run
 ------------------------------
 
 In case you're not already aware, BEAST can take quite a while to run for a real analysis.
-Analyses frequently take hours, days, even weeks, depending on the amount of data and complexity of the analysis.
+Analyses frequently take hours, days, even weeks or months, depending on the amount of data and complexity of the analysis.
 However, when you first run the Argo Navis BEAST tool, you'll notice that it runs in a few minutes on most datasets.
 These default settings are intended for quickly running your data, to make sure things are set up properly.
 
-Once you've seen your data from one end of the tool to the other, you'll likely need to greatly increase the sampling interval.
-Then once your first *real* run has completed, you'll need to check that it ran long enough.
+Once you've seen your data from one end of the tool to the other, *you will likely need to greatly increase the sampling interval.*
+Then once your first real run has completed, you'll need to check that it ran long enough.
 If it did not, you can perform a Resume run, to pick up where you left off.
 All this functionality is covered below, and in detail in the documentation residing within the BEAST tool.
 
@@ -116,7 +114,7 @@ Go to "Run BEAST" in our Tool menu, then at the bottom select "Yes, please" for 
 Once you select this, a number of additional option will open up.
 You must specify the "BEAST logfile", "BEAST treefile", and "BEAST state file" from your previous run for each of
 the respective inputs which appeared.
-Additionally, you will have to select "Custom or Resume" for "BEAST file specification" just above, and 
+Additionally, you will have to select "Custom or Resume" for "BEAST file specification" just above, and
 specify the "BEAST config file" output by the last run of the tool.
 
 The last thing we'll need to do is decide how many new samples to draw.

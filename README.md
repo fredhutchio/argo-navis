@@ -1,10 +1,8 @@
 
 # Argo Navis
 
-**Argo Navis** is a *set* of Galaxy tools designed for carrying out *Ancestral Discrete Trait* analyses, for phylogeographics and molecular epidemiology.
-It does this in a Bayesian setting, using [BEAST2](http://beast2.org) to produce posteriors, and [PACT](http://bedford.io/projects/PACT/) as an analysis tool to extract information from these posteriors.
-
-For more information about the tool, please see the help section of the `introduction.xml` "tool".
+**Argo Navis** is a set of Galaxy tools to carry out Bayesian discrete phylogenetic trait analyses using [BEAST2](http://beast2.org) to sample posteriors and [PACT](http://bedford.io/projects/PACT/) to extract information from these posteriors.
+For background and more information, please see the help section of the `introduction.xml` "tool".
 
 
 ## Running in dev mode
