@@ -8,7 +8,7 @@ For background and more information, please see the help section of the `introdu
 
 Before running Argo Navis in either dev or production, there are a number of dependencies which must be installed:
 
-* BEAST2
+* BEAST2, and the BEAST_CLASSIC package
 * PACT
 * R, and the following libraries
     * RColorBrewer
@@ -24,6 +24,9 @@ Before running Argo Navis in either dev or production, there are a number of dep
     * svg_stack.py
 * inkscape
 * java
+
+Java, Inkscape, and R must all be installed.
+For all the other dependencies, the `env/envbootstrap.sh` can be run to set up a virtualenv which contains the rest of the dependencies.
 
 
 ## Running in dev mode

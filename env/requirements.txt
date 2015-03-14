@@ -1,0 +1,4 @@
+csvkit
+-e git+https://github.com/fhcrc/alnclst.git#egg=alnclst
+-e git+https://github.com/astraw/svg_stack#egg=svg_stack
+-e git+https://github.com/fhcrc/biopy.git#egg=biopy
