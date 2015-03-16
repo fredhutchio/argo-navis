@@ -16,54 +16,10 @@
 <run chainLength="100000000" id="mcmc" spec="MCMC">
     <state id="state" storeEvery="5000">
         <tree id="Tree.t:trimmed" name="stateNode">
-            <trait id="dateTrait.t:trimmed" spec="beast.evolution.tree.TraitSet" traitname="date">MiniSchr.HQ613158|bat|2008=bat,
-MiniSchr.HQ613167|bat|2008=bat,
-MiniSchr.JQ814856|bat|2010=bat,
-MyotRick.EU847166|bat|2004=bat,
-HippArmi.FJ571094|bat|2007=bat,
-TaphMela.FJ571090|bat|2007=bat,
-MiniPusi.EU847197|bat|2005=bat,
-TaphMela.FJ571122|bat|2007=bat,
-MyotRick.EU847162|bat|2004=bat,
-ScotKuhl.KJ571385|bat|2008=bat,
-HippLarv.KJ571394|bat|2008=bat,
-RhinPusi.KJ571428|bat|2009=bat,
-Swin.HM756267|pig|2006=pig,
-Swin.HM756262|pig|2006=pig,
-SusScroDome.KJ533344|pig|2012=pig,
-SusScroDome.KJ533345|pig|2012=pig,
-SusScroDome.KJ533348|pig|2012=pig,
-SusScroDome.KJ533355|pig|2012=pig,
-SusScroDome.KJ533357|pig|2012=pig,
-SusScroDome.KJ533364|pig|2012=pig,
-SusScroDome.JX519275|pig|2011=pig,
-SusScroDome.JX519276|pig|2011=pig,
-SusScroDome.JX519281|pig|2011=pig,
-Pig.HQ647383|pig|2009=pig,
-LaboMous.JQ408739|rodent|2011=rodent,
-RattNorv.HM450385|rodent|2008=rodent,
-MusMusc.JF755422|rodent|2012=rodent,
-NiviEha.KJ571477|rodent|2012=rodent,
-EothCach.KJ571439|rodent|2012=rodent,
-EothCach.KJ571440|rodent|2012=rodent,
-EothCach.KJ571442|rodent|2012=rodent,
-EothCach.KJ571449|rodent|2012=rodent,
-EothCach.KJ571450|rodent|2012=rodent,
-EothCach.KJ571456|rodent|2012=rodent,
-EothCach.KJ571460|rodent|2012=rodent,
-VoleMill.KJ571473|rodent|2012=rodent,
-HomoSapi.FJ755403|human|2006=human,
-HomoSapi.KC342249|human|2012=human,
-HomoSapi.JQ403108|human|2010=human,
-HomoSapi.HM120878|human|2009=human,
-HomoSapi.JF491430|human|2004=human,
-HomoSapi.GQ267696|human|2008=human,
-HomoSapi.JX179278|human|1983=human,
-HomoSapi.JQ673585|human|2011=human,
-HomoSapi.JX857869|human|2008=human,
-HomoSapi.GQ502191|human|2008=human,
-HomoSapi.JQ673581|human|2011=human,
-HomoSapi.HM989955|human|2009=human<taxa id="TaxonSet.trimmed" spec="TaxonSet"><data idref="trimmed" name="alignment" /></taxa></trait><taxonset idref="TaxonSet.trimmed" /></tree>
+            <taxonset id="TaxonSet.trimmed" spec="TaxonSet">
+                <data idref="trimmed" name="alignment" />
+            </taxonset>
+        </tree>
         <parameter id="kappa.s:trimmed" lower="0.0" name="stateNode">2.0</parameter>
         <parameter id="gammaShape.s:trimmed" name="stateNode">1.0</parameter>
         <parameter dimension="5" id="bPopSizes.t:trimmed" lower="0.0" name="stateNode" upper="380000.0">380.0</parameter>
