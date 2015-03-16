@@ -132,8 +132,9 @@ format_beastfile.py $BEASTFILE_TEMPLATE $FORMAT_ARGS $FORMATTED_BEASTFILE
 
 # Actually run BEAST and set the output vars to their locations
 cp $FORMATTED_BEASTFILE beastfile.xml
-# The manual path is because matsengrp's beast is v1
-/home/csmall/local/bin/beast $RANDOM_SEED_FLAG $RESUME_FLAG beastfile.xml
+
+# BEAST should be in our path from the argo_env requirement
+beast $RANDOM_SEED_FLAG $RESUME_FLAG beastfile.xml
 
 # Copy files over to the locations Galaxy has specified for them
 cp posterior.log $LOGFILE

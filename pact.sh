@@ -3,9 +3,6 @@
 source $(dirname $0)/util.sh
 source $1
 
-# Need this for csvkit features mostly XXX
-PATH="/home/csmall/pythedge-clstr/bin:$PATH"
-
 
 
 # PRELIMINARY RUN OF PACT FOR TMRCA AND DEME MAP
