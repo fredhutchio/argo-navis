@@ -4,7 +4,7 @@
     <datatype extension="statefile" type="galaxy.datatypes.xml:GenericXml" subclass="True" display_in_upload="True"/>
     <datatype extension="beastfile" type="galaxy.datatypes.xml:GenericXml" subclass="True" display_in_upload="True"/>
     <datatype extension="full_logfile"    type="galaxy.datatypes.tabular:Tabular" subclass="True" display_in_upload="True"/>
-    <datatype extension="krimmed_logfile" type="galaxy.datatypes.tabular:Tabular" subclass="True" display_in_upload="True"/>
+    <datatype extension="trimmed_logfile" type="galaxy.datatypes.tabular:Tabular" subclass="True" display_in_upload="True"/>
     <datatype extension="full_treefile"    type="galaxy.datatypes.data:Nexus" subclass="True" display_in_upload="True"/>
     <datatype extension="trimmed_treefile" type="galaxy.datatypes.data:Nexus" subclass="True" display_in_upload="True"/>
   </registration>
