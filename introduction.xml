@@ -168,7 +168,7 @@ Bedford T, Cobey S, Beerli P, Pascual M. (2010) `Global migration dynamics under
 
 Hopefully, we'll be able to grow this list over time.
 
-.. _sample data: http://xxx.doesntexist.yet
+.. _sample data: https://github.com/fredhutchio/argo-navis/raw/master/data/example_data.zip
 .. _Tracer: http://tree.bio.ed.ac.uk/software/tracer/
 .. _BEAST tutorial on Tracer: http://beast.bio.ed.ac.uk/analysing-beast-output
 .. _Ancestral State Reconstruction tutorial: http://beast-classic.googlecode.com/files/ARv2.0.1.pdf
