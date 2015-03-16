@@ -1,5 +1,8 @@
 <tool id="ARGO_beast_run" name="Run BEAST" version="1.0.0">
   <description>Perform a discrete trait ancestral reconstruction analysis using BEAST</description>
+  <requirements>
+    <requirement type="package" version="0.1">argo_env</requirement>
+  </requirements>
   <macros>
     <import>macros.xml</import>
   </macros>

@@ -1,5 +1,9 @@
 <tool id="ARGO_pact_run" name="Run PACT" version="1.0.0">
   <description>Analyze Argo Navis BEAST run using PACT</description>
+  <requirements>
+    <requirement type="package" version="3.1.2">R</requirement>
+    <requirement type="package" version="0.1">argo_env</requirement>
+  </requirements>
   <macros>
     <import>macros.xml</import>
   </macros>
