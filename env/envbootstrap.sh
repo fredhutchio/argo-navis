@@ -94,6 +94,7 @@ if [[ ! -f $VENV/bin/beast ]]; then
 fi
 
 # Add the BEAST_CLASSIC package
+addonmanager -add BEASTlabs
 addonmanager -add BEAST_CLASSIC
 
 
