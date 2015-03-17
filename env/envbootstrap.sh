@@ -63,6 +63,9 @@ source $VENV/bin/activate
 # contains the absolute path
 VENV=$VIRTUAL_ENV
 
+# Start an env.sh file
+echo ". $VENV/bin/activate" > $VENV/env.sh
+
 venv_abspath=$(readlink -f $VENV)
 
 # First install all python requirements
@@ -70,13 +73,14 @@ pip install numpy
 pip install scipy
 pip install biopython
 pip install lxml
-pip install -r requirements.txt
+pip install -r $REQFILE
 
-# Next install R requirements, and set up R_LIBS export in env
+# Next install R requirements, and set up R_LIBS export in env.sh
 R_LIBS=$VENV/lib/R
 mkdir -p $R_LIBS
-R_LIBS=$R_LIBS ./rdeps.R
-echo "export R_LIBS=$R_LIBS" >> $VENV/env.sh
+R_LIBS=$R_LIBS $SCRIPT_LOCATION/rdeps.R
+
+echo "R_LIBS=$R_LIBS ; export R_LIBS" >> $VENV/env.sh
 
 
 # For everything else, we'll try to use encapish setup

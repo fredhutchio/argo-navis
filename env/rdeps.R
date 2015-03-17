@@ -3,5 +3,5 @@
 install.packages(c("RColorBrewer",
                    "ggplot2",
                    "gtable",
-                   "argparse"))
-
+                   "argparse"),
+                 repos='http://cran.us.r-project.org')
