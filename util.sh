@@ -44,14 +44,7 @@ on_exit() {
     echo "Elapsed time: $(timer ${START_TIME})"
 }
 
-set -ex
-
-MATSENGRP="/home/matsengrp/local"
-export PATH="${MATSENGRP}/bin:${PATH}"
-export LD_LIBRARY_PATH="${MATSENGRP}/lib:${MATSENGRP}/lib64:${MATSENGRP}/lib64/R/lib:${LD_LIBRARY_PATH}"
-export PERL5LIB="${MATSENGRP}/lib/perl5:${PERL5LIB}"
-
-set -u
+set -eux
 
 START_TIME=$(timer)
 trap on_exit EXIT
@@ -60,4 +53,3 @@ trap on_exit EXIT
 # in it
 export ARGO_TOOL_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 export PATH=$ARGO_TOOL_DIR/bin:$PATH
-
