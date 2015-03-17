@@ -69,6 +69,7 @@ venv_abspath=$(readlink -f $VENV)
 pip install numpy
 pip install scipy
 pip install biopython
+pip install lxml
 pip install -r requirements.txt
 
 # Next install R requirements, and set up R_LIBS export in env
