@@ -141,7 +141,7 @@
     <!-- RESUME RUN OPTIONS -->
     <!-- ================== -->
     <conditional name="resume">
-      <param name="selector" type="select" display="radio" label="Resume from a previous run?"
+      <param name="selector" type="select" label="Resume from a previous run?"
         help="If you ran BEAST but found it didn't run long enough, you can resume your run from where you left off.
         Note you will need to specify some of the previous run's outputs here and in the 'BEAST file specification' above,
         and the only other parameters that will have any effect on the run will be the number of samples.
