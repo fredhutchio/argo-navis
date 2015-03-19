@@ -87,4 +87,28 @@ It's a python library; Look it up.
 
 If you already have an existing Galaxy deployment, you should be able to just clone the repo, and modify the datatypes and tool config lines in your `ini` file, as explained above.
 
+If you've configured your Galaxy instance for installation of tools from the Galaxy toolsheds, you can use the `env/envbootstrap.sh` script mentioned above to install Argo Navis's dependencies (except Java, Inkscape, and R) to Galaxy's `tool_dependency_dir`.
 
+Say your `tool_dependency_dir` is in `/home/galaxy/tool_deps`.
+Create a directory called `argo_env/0.1` in this directory:
+
+```
+$ mkdir -p /home/galaxy/tool_deps/argo_env/0.1
+```
+
+Use the bootstrap script to create the virtualenv in the new directory:
+
+```
+$ ./env/envbootstrap.sh --venv /home/galaxy/tool_deps/argo_env/0.1/venv
+```
+
+This will take a while.
+Once the bootstrap script finishes, create an `env.sh` file in `/home/galaxy/tool_deps/argo_env/0.1` with the following contents:
+
+```
+. /home/galaxy/tool_deps/argo_env/0.1/venv/bin/activate
+R_LIBS=/home/galaxy/tool_deps/argo_env/0.1/venv/lib/R ; export R_LIBS
+```
+
+Galaxy will automatically source this file just before executing the tool command line in order to set up the job environment.
+For more information on how this works, see the [tool dependencies page](https://wiki.galaxyproject.org/Admin/Config/ToolDependencies) on the Galaxy wiki.
