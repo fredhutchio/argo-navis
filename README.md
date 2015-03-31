@@ -31,18 +31,15 @@ For all the other dependencies, the `env/envbootstrap.sh` can be run to set up a
 
 ## Running in dev mode
 
-### 1. Checkout the `galaxy-central` code:
+### 1. Clone the Galaxy repository
 
-```hg clone https://bitbucket.org/galaxy/galaxy-central```
+```git clone https://github.com/galaxyproject/galaxy.git```
 
-You will need Mercurial installed.
-I _know_.
-`sudo apt-get install mercurial` if you don't have `hg` already.
-Then run the above and `cd galaxy-central`.
+Then enter the newly-created directory with `cd galaxy`.
 
 ### 2. Next clone _this_ repo into `tools/argo-navis`
 
-```git clone git@github.com:fredhutchio/argo-navis.git tools/argo-navis```
+```git clone https://github.com/fredhutchio/argo-navis.git tools/argo-navis```
 
 Galaxy is a bit picky about where things live, so make sure you get the path right.
 
